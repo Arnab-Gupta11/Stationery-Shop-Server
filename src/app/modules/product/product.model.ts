@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { model, Schema } from 'mongoose';
 import { TProduct } from './product.interface';
 
 const productSchema = new Schema<TProduct>({
@@ -47,3 +47,5 @@ const productSchema = new Schema<TProduct>({
     required: [true, 'Product stock is required'],
   },
 });
+
+export const Product = model<TProduct>('Product', productSchema);
