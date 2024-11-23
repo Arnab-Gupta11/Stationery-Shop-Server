@@ -4,7 +4,7 @@ import { Order } from './order.model';
 
 const createNewOrderIntoDB = async (orderData: TOrder) => {
   const { quantity } = orderData;
-  //Feth product details using product id in order
+  //Fetch product details using product id in order
   const product = await Product.findById(orderData.product);
   //product not found error
   if (!product) {
@@ -47,13 +47,14 @@ const createNewOrderIntoDB = async (orderData: TOrder) => {
   //Create the new order into database.
   const result = await Order.create({
     ...orderData,
-    totalPrice: quantity * product.price,
+    // totalPrice: quantity * product.price,
   });
   return result;
 };
 
 const calulateRevenue = async () => {
   const revenueData = await Order.aggregate([
+    //stage-1:get the product details using product key.
     {
       $lookup: {
         from: 'products',
@@ -62,9 +63,11 @@ const calulateRevenue = async () => {
         as: 'productDetails',
       },
     },
+    //stage-2: unwind the productDetails array.
     {
       $unwind: '$productDetails',
     },
+    //stage-3: calculate total price for each order.
     {
       $addFields: {
         calculatedTotalPrice: {
@@ -72,12 +75,14 @@ const calulateRevenue = async () => {
         },
       },
     },
+    //stage-4:group all the order.the calculate total revenue
     {
       $group: {
         _id: null,
         totalRevenue: { $sum: '$calculatedTotalPrice' },
       },
     },
+    //stage-5: send the required data.
     {
       $project: {
         _id: 0,

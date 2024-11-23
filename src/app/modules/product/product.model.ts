@@ -1,6 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { TProduct } from './product.interface';
 
+//Define a Mongoose schema for the Product model.
 const productSchema = new Schema<TProduct>(
   {
     name: {
@@ -53,5 +54,5 @@ const productSchema = new Schema<TProduct>(
     versionKey: false,
   },
 );
-
+//Product Model
 export const Product = model<TProduct>('Product', productSchema);

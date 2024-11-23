@@ -1,3 +1,4 @@
+//Define a Typescript type for a Product.
 export type TProduct = {
   name: string;
   brand: string;

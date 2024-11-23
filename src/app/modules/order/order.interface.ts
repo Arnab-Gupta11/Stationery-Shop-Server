@@ -1,3 +1,4 @@
+//Define Typescript type for Order.
 import { Types } from 'mongoose';
 
 export type TOrder = {

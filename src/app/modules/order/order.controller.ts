@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { orderService } from './order.services';
 
+//Creat a new Order.
 const createOrder = async (req: Request, res: Response) => {
   try {
     const orderData = req.body;
@@ -46,6 +47,7 @@ const createOrder = async (req: Request, res: Response) => {
   }
 };
 
+//Get total revenue.
 const getTotalRevenue = async (req: Request, res: Response) => {
   try {
     const totalRevenue = await orderService.calulateRevenue();
@@ -56,6 +58,7 @@ const getTotalRevenue = async (req: Request, res: Response) => {
         totalRevenue,
       },
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     res.status(500).json({
       message: 'An error occured while calculating the total revenue',
