@@ -5,13 +5,22 @@ const createProductIntoDB = async (productData: TProduct) => {
   const result = await Product.create(productData);
   return result;
 };
-const getAllProductFromDB = async () => {
-  const result = await Product.find();
+const getAllProductFromDB = async (queary: object) => {
+  const result = await Product.find(queary);
   return result;
 };
 
 const getSingleProductFromDB = async (id: string) => {
   const result = await Product.findById(id);
+  return result;
+};
+
+const updateProductIntoDB = async (id: string, updates: object) => {
+  const result = await Product.findByIdAndUpdate(
+    id,
+    { ...updates },
+    { new: true, runValidators: true },
+  );
   return result;
 };
 
@@ -21,4 +30,5 @@ export const productServices = {
   createProductIntoDB,
   getAllProductFromDB,
   getSingleProductFromDB,
+  updateProductIntoDB,
 };
