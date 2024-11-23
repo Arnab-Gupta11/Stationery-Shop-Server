@@ -1,4 +1,3 @@
-import { create } from 'domain';
 import { Product } from '../product/product.model';
 import { TOrder } from './order.interface';
 import { Order } from './order.model';
@@ -46,10 +45,51 @@ const createNewOrderIntoDB = async (orderData: TOrder) => {
     });
   }
   //Create the new order into database.
-  const result = await Order.create(orderData);
+  const result = await Order.create({
+    ...orderData,
+    totalPrice: quantity * product.price,
+  });
   return result;
+};
+
+const calulateRevenue = async () => {
+  const revenueData = await Order.aggregate([
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'product',
+        foreignField: '_id',
+        as: 'productDetails',
+      },
+    },
+    {
+      $unwind: '$productDetails',
+    },
+    {
+      $addFields: {
+        calculatedTotalPrice: {
+          $multiply: ['$productDetails.price', '$quantity'],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: '$calculatedTotalPrice' },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalRevenue: 1,
+      },
+    },
+  ]);
+  const totalRevenue = revenueData[0]?.totalRevenue || 0;
+  return totalRevenue;
 };
 
 export const orderService = {
   createNewOrderIntoDB,
+  calulateRevenue,
 };

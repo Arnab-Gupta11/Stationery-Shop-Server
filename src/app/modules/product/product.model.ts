@@ -50,6 +50,7 @@ const productSchema = new Schema<TProduct>(
   },
   {
     timestamps: true,
+    versionKey: false,
   },
 );
 

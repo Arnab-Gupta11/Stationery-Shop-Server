@@ -84,11 +84,37 @@ const getSingleProduct = async (req: Request, res: Response) => {
   }
 };
 const getAllProducts = async (req: Request, res: Response) => {
-  console.log(req.query);
-  const result = await productServices.getAllProductFromDB(req.query);
-  res.status(200).json({
-    data: result,
-  });
+  const { searchTerm } = req.query;
+  let query = {};
+  if (searchTerm) {
+    query = {
+      $or: [
+        { name: searchTerm },
+        { brand: searchTerm },
+        { category: searchTerm },
+      ],
+    };
+  }
+  const result = await productServices.getAllProductFromDB(query);
+  if (result.length === 0 && searchTerm) {
+    res.status(404).json({
+      message: 'Resource not found',
+      success: false,
+      error: {
+        name: 'NotFoundError',
+        message: `No Product found matching the search term ${searchTerm}`,
+        path: 'searchTerm',
+        value: searchTerm,
+      },
+      stack: new Error().stack,
+    });
+  } else {
+    res.status(200).json({
+      message: 'Products retrieved successfully',
+      status: true,
+      data: result,
+    });
+  }
 };
 const updateProduct = async (req: Request, res: Response) => {
   try {
@@ -99,7 +125,7 @@ const updateProduct = async (req: Request, res: Response) => {
       updates,
     );
     if (!result) {
-      res.status(400).json({
+      res.status(404).json({
         message: 'Resource not found',
         success: false,
         error: {
@@ -149,25 +175,43 @@ const updateProduct = async (req: Request, res: Response) => {
 };
 
 const deleteProduct = async (req: Request, res: Response) => {
-  const { productId } = req.params;
-  const result = await productServices.deleteProductFromDB(productId);
-  if (!result) {
-    res.status(400).json({
-      message: 'Resource not found',
+  try {
+    const { productId } = req.params;
+    const result = await productServices.deleteProductFromDB(productId);
+    if (!result) {
+      res.status(400).json({
+        message: 'Resource not found',
+        success: false,
+        error: {
+          name: 'NotFoundError',
+          message: `Product with ID ${productId} does not exist.`,
+          path: 'productId',
+          value: productId,
+        },
+        stack: new Error().stack,
+      });
+    } else {
+      res.status(200).json({
+        message: 'Product deleted successfully',
+        status: true,
+        data: {},
+      });
+    }
+  } catch (err: any) {
+    res.status(500).json({
+      message: 'An error occured while creating the product',
       success: false,
       error: {
-        name: 'NotFoundError',
-        message: `Product with ID ${productId} does not exist.`,
-        path: 'productId',
-        value: productId,
+        name: err.name || 'InternalError',
+        errors: {
+          general: {
+            message: err.message || 'unexpected error occured',
+            name: err.name || 'InternalError',
+            path: 'general',
+          },
+        },
       },
-      stack: new Error().stack,
-    });
-  } else {
-    res.status(200).json({
-      message: 'Product deleted successfully',
-      status: true,
-      data: {},
+      stack: err.stack,
     });
   }
 };

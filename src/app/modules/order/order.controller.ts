@@ -7,8 +7,8 @@ const createOrder = async (req: Request, res: Response) => {
     const result = await orderService.createNewOrderIntoDB(orderData);
     if (result) {
       res.status(200).json({
-        message: 'Product created successfully',
-        success: true,
+        message: 'Order created successfully',
+        status: true,
         data: result,
       });
     }
@@ -45,6 +45,36 @@ const createOrder = async (req: Request, res: Response) => {
     }
   }
 };
+
+const getTotalRevenue = async (req: Request, res: Response) => {
+  try {
+    const totalRevenue = await orderService.calulateRevenue();
+    res.status(200).json({
+      message: 'Revenue calculated successfully',
+      status: true,
+      data: {
+        totalRevenue,
+      },
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      message: 'An error occured while calculating the total revenue',
+      success: false,
+      error: {
+        name: err.name || 'InternalError',
+        errors: {
+          general: {
+            message: err.message || 'unexpected error occured',
+            name: err.name || 'InternalError',
+            path: 'general',
+          },
+        },
+      },
+      stack: err.stack,
+    });
+  }
+};
 export const orderController = {
   createOrder,
+  getTotalRevenue,
 };
