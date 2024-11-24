@@ -95,7 +95,7 @@ Ensure you have the following installed:
 ### **Clone the Repository**
 
 ```bash
-git clone https://github.com/your-username/stationery-shop-management.git
+https://github.com/Arnab-Gupta11/Stationery-Shop-Server.git
 cd stationery-shop-management
 ```
 ### **Install Dependencies**
