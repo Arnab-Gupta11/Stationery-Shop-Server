@@ -1,31 +1,38 @@
 import express, { Application, Request, Response } from 'express';
-import { ProductRoutes } from './app/modules/product/product.routes';
-import { OrderRoutes } from './app/modules/order/order.routes';
-
+import router from './app/routes';
+import globalErrorHandler from './app/middlewares/globalErrorhandler';
+import notFound from './app/middlewares/notFound';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 const app: Application = express();
+
+const corsOptions = {
+  origin: 'https://your-production-domain.com', // Allow only your production domain
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allowed HTTP methods
+  credentials: true, // Allow cookies to be sent
+  optionsSuccessStatus: 204, // Some legacy browsers choke on 204
+};
+
 //Middleware to parse incoming JSON request
 app.use(express.json());
+app.use(cors(corsOptions));
+app.use(cookieParser());
 
 //Application Routes
 //Product related API endpoints
-app.use('/api/products', ProductRoutes);
-//Order related API endpoints
-app.use('/api/orders', OrderRoutes);
+app.use('/api/v1', router);
 
 //Base route
 app.get('/', (req: Request, res: Response) => {
   res.json({
     status: true,
-    message: 'Stationery Shop Server Live',
+    message: 'Stationery Shop Server Live ⚡',
   });
 });
 
-//Fallback Route: hadle all undefined routes
-app.all('*', (req: Request, res: Response) => {
-  res.status(400).json({
-    success: false,
-    message: 'Route is not Found',
-  });
-});
+//Not found route
+app.use(notFound);
+//Global Error Handler
+app.use(globalErrorHandler);
 
 export default app;
