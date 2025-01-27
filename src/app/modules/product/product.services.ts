@@ -1,3 +1,5 @@
+import QueryBuilder from '../../builder/QueryBuilder';
+import { productSearchableFields } from './product.constant';
 import { TProduct } from './product.interface';
 import { Product } from './product.model';
 
@@ -7,9 +9,21 @@ const createProductIntoDB = async (productData: TProduct) => {
   return result;
 };
 //Get all product from database.
-const getAllProductFromDB = async (queary: object) => {
-  const result = await Product.find(queary);
-  return result;
+const getAllProductFromDB = async (query: Record<string, unknown>) => {
+  const productQuery = new QueryBuilder(Product.find(), query)
+    .search(productSearchableFields)
+    .filter()
+    .sort()
+    .sortOrder()
+    .paginate();
+
+  const result = await productQuery.modelQuery;
+  const meta = await productQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
 };
 //Get single product from database.
 const getSingleProductFromDB = async (id: string) => {

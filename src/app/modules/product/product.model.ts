@@ -48,6 +48,10 @@ const productSchema = new Schema<TProduct>(
       type: Boolean,
       required: [true, 'Product stock is required'],
     },
+    image: {
+      type: String,
+      required: [true, 'Product image is required'],
+    },
   },
   {
     timestamps: true,

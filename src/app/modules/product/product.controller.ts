@@ -32,19 +32,18 @@ const getSingleProduct = async (req: Request, res: Response) => {
 };
 
 //get all product.
-const getAllProducts = async (req: Request, res: Response) => {
-  const { searchTerm } = req.query;
-
-  const result = await productServices.getAllProductFromDB({ searchTerm });
+const getAllProducts = catchAsync(async (req: Request, res: Response) => {
+  const result = await productServices.getAllProductFromDB(req.query);
   if (result) {
     sendResponse(res, {
       success: true,
       message: 'Retrieved all product successfully',
       statusCode: 200,
-      data: result,
+      meta: result.meta,
+      data: result.result,
     });
   }
-};
+});
 //update product.
 const updateProduct = async (req: Request, res: Response) => {
   const updates = req.body;

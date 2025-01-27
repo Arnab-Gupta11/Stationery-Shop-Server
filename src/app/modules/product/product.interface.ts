@@ -12,4 +12,5 @@ export type TProduct = {
   description: string;
   quantity: number;
   inStock: boolean;
+  image: string;
 };
