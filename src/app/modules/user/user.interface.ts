@@ -9,6 +9,9 @@ export interface IUser {
   email: string;
   password: string;
   role: 'admin' | 'user';
+  phone?: string;
+  address?: string;
+  city?: string;
   isBlocked: boolean;
 }
 

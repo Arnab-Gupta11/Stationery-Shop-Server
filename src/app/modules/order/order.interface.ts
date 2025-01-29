@@ -12,8 +12,17 @@ export type TOrder = {
   user: Types.ObjectId;
   products: TOrderProduct[];
   totalOrderPrice: number;
-  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
-  paymentStatus: 'Pending' | 'Completed' | 'Failed' | 'Refunded';
+  status: 'Pending' | 'Shipping';
+  paymentStatus: 'Pending' | 'Paid' | 'Cancelled';
+  transaction: {
+    id: string;
+    transactionStatus: string;
+    bank_status: string;
+    sp_code: string;
+    sp_message: string;
+    method: string;
+    date_time: string;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 };

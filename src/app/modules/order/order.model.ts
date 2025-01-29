@@ -34,13 +34,22 @@ const orderSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+      enum: ['Pending', 'Shipping'],
       default: 'Pending',
     },
     paymentStatus: {
       type: String,
-      enum: ['Pending', 'Completed', 'Failed', 'Refunded'],
+      enum: ['Pending', 'Paid', 'Cancelled'],
       default: 'Pending',
+    },
+    transaction: {
+      id: String,
+      transactionStatus: String,
+      bank_status: String,
+      sp_code: String,
+      sp_message: String,
+      method: String,
+      date_time: String,
     },
   },
   {

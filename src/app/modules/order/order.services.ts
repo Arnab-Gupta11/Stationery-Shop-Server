@@ -1,12 +1,107 @@
-import { JwtPayload } from 'jsonwebtoken';
 import { Product } from '../product/product.model';
 import { TProductsOrder } from './order.interface';
 import { Order } from './order.model';
 import mongoose from 'mongoose';
+import { IUser } from '../user/user.interface';
+import { orderUtils } from './order.utils';
+
+// const createNewOrderIntoDB = async (
+//   orderData: TProductsOrder,
+//   user: IUser,
+//   client_ip: string,
+// ) => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   try {
+//     const { products } = orderData;
+//     let totalOrderPrice = 0;
+//     const updatedProducts = [];
+
+//     for (const item of products) {
+//       const product = await Product.findById(item.product).session(session);
+
+//       if (!product) {
+//         throw new Error(`Product with ID ${item.product} not found.`);
+//       }
+
+//       if (product.quantity < item.quantity) {
+//         throw new Error(
+//           `Only ${product.quantity} items of ${product.name} are available in stock.`,
+//         );
+//       }
+
+//       // Calculate total price for each product
+//       const totalPrice = item.quantity * product.price;
+//       totalOrderPrice += totalPrice;
+
+//       updatedProducts.push({
+//         product: product._id,
+//         quantity: item.quantity,
+//         totalPrice,
+//       });
+
+//       // Update product stock
+//       product.quantity -= item.quantity;
+//       if (product.quantity === 0) {
+//         product.inStock = false;
+//       }
+//       await product.save({ session });
+//     }
+
+//     const orderDetails = {
+//       user: user._id,
+//       products: updatedProducts,
+//       totalOrderPrice,
+//       status: 'Pending',
+//       paymentStatus: 'Pending',
+//     };
+
+//     // Create order in DB
+//     const newOrder: TOrder[] = await Order.create([orderDetails], {
+//       session,
+//     });
+
+//     // ✅ If everything is successful, commit the transaction
+//     await session.commitTransaction();
+//     session.endSession();
+
+//     // payment integration
+//     const shurjopayPayload = {
+//       amount: totalOrderPrice,
+//       order_id: newOrder[0]._id,
+//       currency: 'BDT',
+//       customer_name: user.fullName,
+//       customer_address: user.address,
+//       customer_email: user.email,
+//       customer_phone: user.phone,
+//       customer_city: user.city,
+//       client_ip,
+//     };
+
+//     const payment = await orderUtils.makePaymentAsync(shurjopayPayload);
+//     if (payment?.transactionStatus) {
+//       await Order.updateOne({
+//         transaction: {
+//           id: payment.sp_order_id,
+//           transactionStatus: payment.transactionStatus,
+//         },
+//       });
+//     }
+
+//     return payment.checkout_url;
+//   } catch (error) {
+//     // ❌ If any error occurs, roll back (undo) all changes
+//     await session.abortTransaction();
+//     session.endSession();
+//     throw error;
+//   }
+// };
 
 const createNewOrderIntoDB = async (
   orderData: TProductsOrder,
-  user: JwtPayload,
+  user: IUser,
+  client_ip: string,
 ) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -48,7 +143,7 @@ const createNewOrderIntoDB = async (
     }
 
     const orderDetails = {
-      user: user.userId,
+      user: user._id,
       products: updatedProducts,
       totalOrderPrice,
       status: 'Pending',
@@ -58,62 +153,127 @@ const createNewOrderIntoDB = async (
     // Create order in DB
     const newOrder = await Order.create([orderDetails], { session });
 
-    // ✅ If everything is successful, commit the transaction
-    await session.commitTransaction();
-    session.endSession();
+    // ✅ Proceed with payment
+    const shurjopayPayload = {
+      amount: totalOrderPrice,
+      order_id: newOrder[0]._id,
+      currency: 'BDT',
+      customer_name: user.fullName,
+      customer_address: user.address,
+      customer_email: user.email,
+      customer_phone: user.phone,
+      customer_city: user.city,
+      client_ip,
+    };
 
-    return newOrder;
+    const payment = await orderUtils.makePaymentAsync(shurjopayPayload);
+
+    // ❌ If payment fails, rollback transaction (but do not call abortTransaction twice)
+    if (!payment?.transactionStatus) {
+      throw new Error('Payment failed. Order has been canceled.');
+    }
+
+    // ✅ If payment succeeds, update order with transaction details
+    await Order.updateOne(
+      { _id: newOrder[0]._id },
+      {
+        transaction: {
+          id: payment.sp_order_id,
+          transactionStatus: payment.transactionStatus,
+        },
+        paymentStatus: 'Completed',
+      },
+      { session },
+    );
+
+    // ✅ Commit the transaction if everything is successful
+    await session.commitTransaction();
+    return payment.checkout_url;
   } catch (error) {
-    // ❌ If any error occurs, roll back (undo) all changes
-    await session.abortTransaction();
-    session.endSession();
+    // ❌ Ensure rollback happens only once
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
     throw error;
+  } finally {
+    // ✅ Ensure session always ends
+    session.endSession();
   }
 };
 
-const calulateRevenue = async () => {
-  const revenueData = await Order.aggregate([
-    //stage-1:get the product details using product key.
-    {
-      $lookup: {
-        from: 'products',
-        localField: 'product',
-        foreignField: '_id',
-        as: 'productDetails',
+const verifyPayment = async (order_id: string) => {
+  const verifiedPayment = await orderUtils.verifyPaymentAsync(order_id);
+
+  if (verifiedPayment.length) {
+    await Order.findOneAndUpdate(
+      {
+        'transaction.id': order_id,
       },
-    },
-    //stage-2: unwind the productDetails array.
-    {
-      $unwind: '$productDetails',
-    },
-    //stage-3: calculate total price for each order.
-    {
-      $addFields: {
-        calculatedTotalPrice: {
-          $multiply: ['$productDetails.price', '$quantity'],
-        },
+      {
+        'transaction.bank_status': verifiedPayment[0].bank_status,
+        'transaction.sp_code': verifiedPayment[0].sp_code,
+        'transaction.sp_message': verifiedPayment[0].sp_message,
+        'transaction.transactionStatus': verifiedPayment[0].transaction_status,
+        'transaction.method': verifiedPayment[0].method,
+        'transaction.date_time': verifiedPayment[0].date_time,
+        paymentStatus:
+          verifiedPayment[0].bank_status == 'Success'
+            ? 'Paid'
+            : verifiedPayment[0].bank_status == 'Failed'
+              ? 'Pending'
+              : verifiedPayment[0].bank_status == 'Cancel'
+                ? 'Cancelled'
+                : 'Pending',
       },
-    },
-    //stage-4:group all the order.the calculate total revenue
-    {
-      $group: {
-        _id: null,
-        totalRevenue: { $sum: '$calculatedTotalPrice' },
-      },
-    },
-    //stage-5: send the required data.
-    {
-      $project: {
-        _id: 0,
-        totalRevenue: 1,
-      },
-    },
-  ]);
-  const totalRevenue = revenueData[0]?.totalRevenue || 0;
-  return totalRevenue;
+    );
+  }
+
+  return verifiedPayment;
 };
+
+// const calulateRevenue = async () => {
+//   const revenueData = await Order.aggregate([
+//     //stage-1:get the product details using product key.
+//     {
+//       $lookup: {
+//         from: 'products',
+//         localField: 'product',
+//         foreignField: '_id',
+//         as: 'productDetails',
+//       },
+//     },
+//     //stage-2: unwind the productDetails array.
+//     {
+//       $unwind: '$productDetails',
+//     },
+//     //stage-3: calculate total price for each order.
+//     {
+//       $addFields: {
+//         calculatedTotalPrice: {
+//           $multiply: ['$productDetails.price', '$quantity'],
+//         },
+//       },
+//     },
+//     //stage-4:group all the order.the calculate total revenue
+//     {
+//       $group: {
+//         _id: null,
+//         totalRevenue: { $sum: '$calculatedTotalPrice' },
+//       },
+//     },
+//     //stage-5: send the required data.
+//     {
+//       $project: {
+//         _id: 0,
+//         totalRevenue: 1,
+//       },
+//     },
+//   ]);
+//   const totalRevenue = revenueData[0]?.totalRevenue || 0;
+//   return totalRevenue;
+// };
 
 export const orderService = {
   createNewOrderIntoDB,
-  calulateRevenue,
+  verifyPayment,
 };
