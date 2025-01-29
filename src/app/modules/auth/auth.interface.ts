@@ -5,7 +5,8 @@ export type TLoginUser = {
   password: string;
 };
 export type TJwtPawload = {
-  _id: ObjectId;
+  userId: ObjectId;
   userEmail: string;
   role: string;
+  profilePicture:string
 };

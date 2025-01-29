@@ -10,6 +10,9 @@ const userSchema = new Schema<IUser, UserModel>(
       type: String,
       required: [true, 'Full Name is required'],
     },
+    profilePicture: {
+      type: String,
+    },
     email: {
       type: String,
       required: true,

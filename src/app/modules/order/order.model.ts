@@ -1,37 +1,46 @@
-import { model, Schema, Types } from 'mongoose';
+import { model, Schema } from 'mongoose';
 import { TOrder } from './order.interface';
 
-//Define schema for order collection.
-const orderSchema = new Schema<TOrder>(
+const orderSchema = new Schema(
   {
-    email: {
-      type: String,
-      required: [true, 'Customer email is required'],
-      match: [
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        'Please enter a valid email address.',
-      ],
-      trim: true,
-    },
-    product: {
-      type: Types.ObjectId,
-      required: [true, 'Product id is required'],
-      trim: true,
-      validate: {
-        validator: function (value: Types.ObjectId) {
-          return Types.ObjectId.isValid(value);
+    products: [
+      {
+        product: {
+          type: Schema.Types.ObjectId,
+          ref: 'Product',
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          min: [1, 'Quantity must be at least 1.'],
+        },
+        totalPrice: {
+          type: Number,
+          required: true,
+          min: [0, 'Total price must be a positive number.'],
         },
       },
-    },
-    quantity: {
+    ],
+    totalOrderPrice: {
       type: Number,
-      required: [true, 'Product quantity is required'],
-      min: [1, 'Product quantity must be atleast 1.'],
+      required: true,
+      min: [0, 'Total order price must be a positive number.'],
     },
-    totalPrice: {
-      type: Number,
-      required: [true, 'Total Price is required'],
-      min: [0, 'Total price cannot be negative.'],
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+      default: 'Pending',
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['Pending', 'Completed', 'Failed', 'Refunded'],
+      default: 'Pending',
     },
   },
   {

@@ -1,55 +1,74 @@
+import { JwtPayload } from 'jsonwebtoken';
 import { Product } from '../product/product.model';
-import { TOrder } from './order.interface';
+import { TProductsOrder } from './order.interface';
 import { Order } from './order.model';
+import mongoose from 'mongoose';
 
-const createNewOrderIntoDB = async (orderData: TOrder) => {
-  const { quantity } = orderData;
-  //Fetch product details using product id in order
-  const product = await Product.findById(orderData.product);
-  //product not found error
-  if (!product) {
-    const error = new Error(
-      `Product with ID ${orderData.product} does not exist.`,
-    );
-    Object.assign(error, {
-      name: 'NotFoundError',
-      displayMessage: 'Resource not found',
-      statusCode: 404,
-      path: 'product',
-      value: orderData.product,
-    });
+const createNewOrderIntoDB = async (
+  orderData: TProductsOrder,
+  user: JwtPayload,
+) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { products } = orderData;
+    let totalOrderPrice = 0;
+    const updatedProducts = [];
+
+    for (const item of products) {
+      const product = await Product.findById(item.product).session(session);
+
+      if (!product) {
+        throw new Error(`Product with ID ${item.product} not found.`);
+      }
+
+      if (product.quantity < item.quantity) {
+        throw new Error(
+          `Only ${product.quantity} items of ${product.name} are available in stock.`,
+        );
+      }
+
+      // Calculate total price for each product
+      const totalPrice = item.quantity * product.price;
+      totalOrderPrice += totalPrice;
+
+      updatedProducts.push({
+        product: product._id,
+        quantity: item.quantity,
+        totalPrice,
+      });
+
+      // Update product stock
+      product.quantity -= item.quantity;
+      if (product.quantity === 0) {
+        product.inStock = false;
+      }
+      await product.save({ session });
+    }
+
+    const orderDetails = {
+      user: user.userId,
+      products: updatedProducts,
+      totalOrderPrice,
+      status: 'Pending',
+      paymentStatus: 'Pending',
+    };
+
+    // Create order in DB
+    const newOrder = await Order.create([orderDetails], { session });
+
+    // ✅ If everything is successful, commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return newOrder;
+  } catch (error) {
+    // ❌ If any error occurs, roll back (undo) all changes
+    await session.abortTransaction();
+    session.endSession();
     throw error;
   }
-  //Check stock available or not
-  if (product.quantity < quantity) {
-    const error = new Error(
-      `Only ${product.quantity} items are available in stock`,
-    );
-    Object.assign(error, {
-      name: 'StockError',
-      displayMessage: 'Insufficient stock available.',
-      statusCode: 400,
-      path: 'quantity',
-      value: quantity,
-    });
-    throw error;
-  }
-  //Update quantity and inStock in the product model.
-  const newQuantity = product.quantity - quantity;
-  if (newQuantity === 0) {
-    const updatedProduct = { quantity: newQuantity, inStock: false };
-    await Product.findByIdAndUpdate(product._id, updatedProduct);
-  } else {
-    await Product.findByIdAndUpdate(product._id, {
-      quantity: newQuantity,
-    });
-  }
-  //Create the new order into database.
-  const result = await Order.create({
-    ...orderData,
-    // totalPrice: quantity * product.price,
-  });
-  return result;
 };
 
 const calulateRevenue = async () => {

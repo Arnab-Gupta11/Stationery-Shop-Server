@@ -7,7 +7,7 @@ import cors from 'cors';
 const app: Application = express();
 
 const corsOptions = {
-  origin: 'https://your-production-domain.com', // Allow only your production domain
+  origin: 'http://localhost:5173', // Allow only your production domain
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allowed HTTP methods
   credentials: true, // Allow cookies to be sent
   optionsSuccessStatus: 204, // Some legacy browsers choke on 204

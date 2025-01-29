@@ -72,10 +72,23 @@ const deleteProduct = async (req: Request, res: Response) => {
     });
   }
 };
+const getMaximumPrice = catchAsync(async (req: Request, res: Response) => {
+  const result = await productServices.getMaximumPriceFromDB();
+  //If no product found.
+  if (result) {
+    sendResponse(res, {
+      success: true,
+      message: 'Maximum Price fetch successfully',
+      statusCode: 200,
+      data: result,
+    });
+  }
+});
 export const productControllers = {
   createProduct,
   getSingleProduct,
   getAllProducts,
   updateProduct,
   deleteProduct,
+  getMaximumPrice,
 };

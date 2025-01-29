@@ -32,6 +32,8 @@ class QueryBuilder<T> {
       'limit',
       'page',
       'fields',
+      'minPrice',
+      'maxPrice',
     ];
     excludeFields.forEach((el) => delete queryObj[el]);
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
@@ -56,10 +58,20 @@ class QueryBuilder<T> {
     }
     return this;
   }
+  //Filter by Price
+  filterByPrice(maxProductPrice: number) {
+    const minPrice = Number(this?.query?.minPrice);
+    const maxPrice = Number(this?.query?.maxPrice);
+    this.modelQuery = this.modelQuery.find({
+      price: { $gte: minPrice || 0, $lte: maxPrice || maxProductPrice },
+    });
+
+    return this;
+  }
   //Paginate
   paginate() {
     const page = Number(this?.query?.page) || 1;
-    const limit = Number(this?.query?.limit) || 3;
+    const limit = Number(this?.query?.limit) || 9;
     const skip = (page - 1) * limit;
     this.modelQuery = this.modelQuery.skip(skip).limit(limit);
 

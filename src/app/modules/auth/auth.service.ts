@@ -30,7 +30,7 @@ const registerUserIntoDB = async (payload: Record<string, string>) => {
   const doesEmailExist = await User.exists({ email });
   if (doesEmailExist) {
     throw new AppError(
-      409,
+      400,
       'A user with this email already exists. Please try logging in or use a different email.',
     );
   }
@@ -40,6 +40,7 @@ const registerUserIntoDB = async (payload: Record<string, string>) => {
     fullName,
     email,
     password,
+    profilePicture: `https://avatar.iran.liara.run/username?username=${fullName}&bold=false&length=1`,
   };
   //Register user into DB
   const newRegisterUser = await User.create(user);
@@ -94,9 +95,10 @@ const loginUser = async (payload: TLoginUser) => {
   //create token and sent to the  client
 
   const jwtPayload = {
-    _id: user._id,
+    userId: user._id,
     userEmail: user.email,
     role: user.role,
+    profilePicture: user.profilePicture,
   };
 
   const accessToken = createAccessToken(

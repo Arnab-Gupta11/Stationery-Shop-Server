@@ -7,6 +7,9 @@ router
   .route('/')
   .post(productControllers.createProduct)
   .get(productControllers.getAllProducts);
+
+router.route('/maxPrice').get(productControllers.getMaximumPrice);
+
 router
   .route('/:productId')
   .get(productControllers.getSingleProduct)
