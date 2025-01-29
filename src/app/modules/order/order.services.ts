@@ -107,7 +107,7 @@ const createNewOrderIntoDB = async (
   session.startTransaction();
 
   try {
-    const { products } = orderData;
+    const { products, userInfo } = orderData;
     let totalOrderPrice = 0;
     const updatedProducts = [];
 
@@ -158,11 +158,11 @@ const createNewOrderIntoDB = async (
       amount: totalOrderPrice,
       order_id: newOrder[0]._id,
       currency: 'BDT',
-      customer_name: user.fullName,
-      customer_address: user.address,
-      customer_email: user.email,
-      customer_phone: user.phone,
-      customer_city: user.city,
+      customer_name: userInfo.fullName,
+      customer_address: userInfo.address,
+      customer_email: userInfo.email,
+      customer_phone: userInfo.phone,
+      customer_city: userInfo.city,
       client_ip,
     };
 
@@ -181,7 +181,6 @@ const createNewOrderIntoDB = async (
           id: payment.sp_order_id,
           transactionStatus: payment.transactionStatus,
         },
-        paymentStatus: 'Completed',
       },
       { session },
     );

@@ -27,5 +27,12 @@ export type TOrder = {
   updatedAt?: Date;
 };
 export type TProductsOrder = {
+  userInfo: {
+    fullName: string;
+    email: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+  };
   products: { product: string; quantity: number }[];
 };

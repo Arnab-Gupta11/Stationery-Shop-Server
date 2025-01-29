@@ -44,5 +44,5 @@ const verifyPayment = catchAsync(async (req, res) => {
 // };
 export const orderController = {
   createOrder,
-  verifyPayment
+  verifyPayment,
 };

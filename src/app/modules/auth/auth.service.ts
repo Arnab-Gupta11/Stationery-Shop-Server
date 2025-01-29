@@ -4,7 +4,11 @@ import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 
 import { TLoginUser } from './auth.interface';
-import { createAccessToken, createRefreshToken } from './auth.utils';
+import {
+  createAccessToken,
+  createRefreshToken,
+  verifyToken,
+} from './auth.utils';
 
 //Register User
 /* ---------> Create a new user. <----------- */
@@ -44,13 +48,6 @@ const registerUserIntoDB = async (payload: Record<string, string>) => {
   };
   //Register user into DB
   const newRegisterUser = await User.create(user);
-
-  //Create a new jobSeeker Profile.
-  // const userProfile = {
-  //   userId: newRegisterUser[0]._id,
-  //   fullName,
-  //   profilePicture: `https://avatar.iran.liara.run/username?username=${fullName}&bold=false&length=1`,
-  // };
 
   //Send Response.
   const response = {
@@ -95,10 +92,14 @@ const loginUser = async (payload: TLoginUser) => {
   //create token and sent to the  client
 
   const jwtPayload = {
+    name: user.fullName,
     userId: user._id,
     userEmail: user.email,
     role: user.role,
     profilePicture: user.profilePicture,
+    city: user.city,
+    phone: user.phone,
+    address: user.address,
   };
 
   const accessToken = createAccessToken(
@@ -116,7 +117,45 @@ const loginUser = async (payload: TLoginUser) => {
     refreshToken,
   };
 };
+
+const refreshToken = async (token: string) => {
+  // checking if the given token is valid
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string);
+
+  const { userId } = decoded;
+
+  // checking if the user is exist
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError(404, 'This user is not found !');
+  }
+
+  // checking if the user is blocked
+
+  if (user.isBlocked) {
+    throw new AppError(403, 'This user is blocked ! !');
+  }
+
+  const jwtPayload = {
+    userId: user._id,
+    userEmail: user.email,
+    role: user.role,
+    profilePicture: user.profilePicture,
+  };
+
+  const accessToken = createAccessToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+  );
+
+  return {
+    accessToken,
+  };
+};
+
 export const AuthServices = {
   registerUserIntoDB,
   loginUser,
+  refreshToken,
 };

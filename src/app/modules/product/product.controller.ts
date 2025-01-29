@@ -18,7 +18,7 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
 });
 
 //get single product.
-const getSingleProduct = async (req: Request, res: Response) => {
+const getSingleProduct = catchAsync(async (req: Request, res: Response) => {
   const { productId } = req.params;
   const result = await productServices.getSingleProductFromDB(productId);
   if (result) {
@@ -29,7 +29,7 @@ const getSingleProduct = async (req: Request, res: Response) => {
       data: result,
     });
   }
-};
+});
 
 //get all product.
 const getAllProducts = catchAsync(async (req: Request, res: Response) => {
@@ -45,7 +45,7 @@ const getAllProducts = catchAsync(async (req: Request, res: Response) => {
   }
 });
 //update product.
-const updateProduct = async (req: Request, res: Response) => {
+const updateProduct = catchAsync(async (req: Request, res: Response) => {
   const updates = req.body;
   const { productId } = req.params;
   const result = await productServices.updateProductIntoDB(productId, updates);
@@ -57,9 +57,9 @@ const updateProduct = async (req: Request, res: Response) => {
       data: result,
     });
   }
-};
+});
 //delete product.
-const deleteProduct = async (req: Request, res: Response) => {
+const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   const { productId } = req.params;
   const result = await productServices.deleteProductFromDB(productId);
   //If no product found.
@@ -71,7 +71,7 @@ const deleteProduct = async (req: Request, res: Response) => {
       data: result,
     });
   }
-};
+});
 const getMaximumPrice = catchAsync(async (req: Request, res: Response) => {
   const result = await productServices.getMaximumPriceFromDB();
   //If no product found.
