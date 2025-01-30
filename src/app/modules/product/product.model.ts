@@ -47,6 +47,7 @@ const productSchema = new Schema<TProduct>(
     inStock: {
       type: Boolean,
       required: [true, 'Product stock is required'],
+      default: true,
     },
     image: {
       type: String,

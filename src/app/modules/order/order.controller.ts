@@ -32,17 +32,35 @@ const verifyPayment = catchAsync(async (req, res) => {
   });
 });
 
-//Get total revenue.
-// const getTotalRevenue = async (req: Request, res: Response) => {
-//   const totalRevenue = await orderService.calulateRevenue();
-//   sendResponse(res, {
-//     success: true,
-//     message: 'Revenue calculated successfully',
-//     statusCode: 200,
-//     data: totalRevenue,
-//   });
-// };
+const getAllOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await orderService.getAllOrders(req.query);
+  if (result) {
+    sendResponse(res, {
+      success: true,
+      message: 'All Orders retrived successfully',
+      statusCode: 200,
+      data: result,
+    });
+  }
+});
+
+const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
+  const updates = req.body;
+  const { orderId } = req.params;
+  const result = await orderService.updateOrderStatusIntoDB(orderId, updates);
+  if (result) {
+    sendResponse(res, {
+      success: true,
+      message: 'Order Status updated successfully',
+      statusCode: 200,
+      data: result,
+    });
+  }
+});
+
 export const orderController = {
+  getAllOrders,
   createOrder,
   verifyPayment,
+  updateOrderStatus,
 };

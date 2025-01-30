@@ -4,6 +4,7 @@ import { Order } from './order.model';
 import mongoose from 'mongoose';
 import { IUser } from '../user/user.interface';
 import { orderUtils } from './order.utils';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 // const createNewOrderIntoDB = async (
 //   orderData: TProductsOrder,
@@ -230,49 +231,38 @@ const verifyPayment = async (order_id: string) => {
   return verifiedPayment;
 };
 
-// const calulateRevenue = async () => {
-//   const revenueData = await Order.aggregate([
-//     //stage-1:get the product details using product key.
-//     {
-//       $lookup: {
-//         from: 'products',
-//         localField: 'product',
-//         foreignField: '_id',
-//         as: 'productDetails',
-//       },
-//     },
-//     //stage-2: unwind the productDetails array.
-//     {
-//       $unwind: '$productDetails',
-//     },
-//     //stage-3: calculate total price for each order.
-//     {
-//       $addFields: {
-//         calculatedTotalPrice: {
-//           $multiply: ['$productDetails.price', '$quantity'],
-//         },
-//       },
-//     },
-//     //stage-4:group all the order.the calculate total revenue
-//     {
-//       $group: {
-//         _id: null,
-//         totalRevenue: { $sum: '$calculatedTotalPrice' },
-//       },
-//     },
-//     //stage-5: send the required data.
-//     {
-//       $project: {
-//         _id: 0,
-//         totalRevenue: 1,
-//       },
-//     },
-//   ]);
-//   const totalRevenue = revenueData[0]?.totalRevenue || 0;
-//   return totalRevenue;
-// };
+export const getAllOrders = async (query: Record<string, unknown>) => {
+  const orderQuery = new QueryBuilder(
+    Order.find()
+      .populate('user', 'fullName email')
+      .populate('products.product'),
+    query,
+  ).paginate();
+
+  const result = await orderQuery.modelQuery;
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+  // return await Order.find()
+  //   .populate('user', 'name email')
+  //   .populate('products.product');
+};
+
+const updateOrderStatusIntoDB = async (id: string, updates: object) => {
+  const result = await Order.findByIdAndUpdate(
+    id,
+    { ...updates },
+    { new: true, runValidators: true },
+  );
+  return result;
+};
 
 export const orderService = {
+  getAllOrders,
   createNewOrderIntoDB,
   verifyPayment,
+  updateOrderStatusIntoDB,
 };
