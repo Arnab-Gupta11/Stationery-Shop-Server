@@ -43,6 +43,17 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
     });
   }
 });
+const getAllOrdersOfAUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await orderService.getSingleUserAllOrders(req.user);
+  if (result) {
+    sendResponse(res, {
+      success: true,
+      message: 'All Orders retrived successfully',
+      statusCode: 200,
+      data: result,
+    });
+  }
+});
 
 const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
   const updates = req.body;
@@ -63,4 +74,5 @@ export const orderController = {
   createOrder,
   verifyPayment,
   updateOrderStatus,
+  getAllOrdersOfAUser,
 };

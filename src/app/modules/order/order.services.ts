@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import { IUser } from '../user/user.interface';
 import { orderUtils } from './order.utils';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { JwtPayload } from 'jsonwebtoken';
 
 // const createNewOrderIntoDB = async (
 //   orderData: TProductsOrder,
@@ -251,6 +252,16 @@ export const getAllOrders = async (query: Record<string, unknown>) => {
   //   .populate('products.product');
 };
 
+const getSingleUserAllOrders = async (user: JwtPayload) => {
+  const orders = await Order.find({ user: user._id })
+    .populate({
+      path: 'products.product',
+    })
+    .sort({ createdAt: -1 }); // Sort orders by most recent
+
+  return orders;
+};
+
 const updateOrderStatusIntoDB = async (id: string, updates: object) => {
   const result = await Order.findByIdAndUpdate(
     id,
@@ -265,4 +276,5 @@ export const orderService = {
   createNewOrderIntoDB,
   verifyPayment,
   updateOrderStatusIntoDB,
+  getSingleUserAllOrders,
 };

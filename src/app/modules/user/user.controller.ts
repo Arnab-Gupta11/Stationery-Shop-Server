@@ -4,7 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.getUserById(req.params.id,req.user);
+  const result = await UserServices.getUserById(req.params.id, req.user);
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -24,7 +24,11 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateUserInfo = catchAsync(async (req: Request, res: Response) => {
-  const updatedUser = await UserServices.updateUser(req.params.id, req.body,req.user);
+  const updatedUser = await UserServices.updateUser(
+    req.params.id,
+    req.body,
+    req.user,
+  );
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -32,8 +36,23 @@ const updateUserInfo = catchAsync(async (req: Request, res: Response) => {
     data: updatedUser,
   });
 });
+
+const updateUserStatus = catchAsync(async (req: Request, res: Response) => {
+  const updates = req.body;
+  const { id } = req.params;
+  const result = await UserServices.updateUserStatusIntoDB(id, updates);
+  if (result) {
+    sendResponse(res, {
+      success: true,
+      message: 'User Status updated successfully',
+      statusCode: 200,
+      data: result,
+    });
+  }
+});
 export const UserController = {
   getSingleUser,
   getAllUsers,
   updateUserInfo,
+  updateUserStatus,
 };

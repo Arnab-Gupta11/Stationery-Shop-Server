@@ -13,4 +13,5 @@ export type TProduct = {
   quantity: number;
   inStock: boolean;
   image: string;
+  rating:
 };

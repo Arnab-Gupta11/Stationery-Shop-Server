@@ -13,7 +13,9 @@ const getUserById = async (userId: string, loginUser: IUser) => {
   return user;
 };
 const getAllUsers = async () => {
-  const result = await User.find().select('-password'); // Exclude password field
+  const result = await User.find({ role: { $ne: 'admin' } }).select(
+    '-password',
+  );
   return result;
 };
 const updateUser = async (
@@ -36,8 +38,18 @@ const updateUser = async (
   return updatedUser;
 };
 
+const updateUserStatusIntoDB = async (id: string, updates: object) => {
+  const result = await User.findByIdAndUpdate(
+    id,
+    { ...updates },
+    { new: true, runValidators: true },
+  );
+  return result;
+};
+
 export const UserServices = {
   getUserById,
   getAllUsers,
   updateUser,
+  updateUserStatusIntoDB,
 };
