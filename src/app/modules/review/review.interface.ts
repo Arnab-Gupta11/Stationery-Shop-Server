@@ -4,7 +4,7 @@ export type TReview = {
   user: Types.ObjectId;
   product: Types.ObjectId;
   rating: number;
-  comment: string;
+  review: string;
 };
 
-export type TReviewPayload = Pick<TReview, 'product' | 'rating' | 'comment'>;
+export type TReviewPayload = Pick<TReview, 'product' | 'rating' | 'review'>;
