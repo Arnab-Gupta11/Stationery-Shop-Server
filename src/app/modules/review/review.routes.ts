@@ -20,6 +20,10 @@ router
     validateRequest(ReviewValidation.updateReviewValidationSchema),
     ReviewController.updateReview,
   )
-  .delete(auth('user'), ReviewController.deleteReview);
+  .delete(auth('user'), ReviewController.deleteReview)
+  .get(auth('user'), ReviewController.getReviewDetails);
+router
+  .route('/getReview/:productId')
+  .get(auth('user'), ReviewController.getAllReview);
 
 export const ReviewRoute = router;

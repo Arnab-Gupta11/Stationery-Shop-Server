@@ -6,6 +6,7 @@ import { IUser } from '../user/user.interface';
 import { TReviewPayload } from './review.interface';
 import { Review } from './review.model';
 
+//Create
 const createReviewIntoDB = async (user: IUser, payload: TReviewPayload) => {
   // Prepare new review data
   const newReviewData = {
@@ -100,6 +101,7 @@ const createReviewIntoDB = async (user: IUser, payload: TReviewPayload) => {
   }
 };
 
+//Update
 const updateReviewFromDB = async (
   user: IUser,
   reviewId: string,
@@ -166,6 +168,8 @@ const updateReviewFromDB = async (
     session.endSession();
   }
 };
+
+//Delete
 const deleteReviewFromDB = async (user: IUser, reviewId: string) => {
   // Start a database session for transaction handling
   const session = await mongoose.startSession();
@@ -184,11 +188,11 @@ const deleteReviewFromDB = async (user: IUser, reviewId: string) => {
       throw new AppError(404, 'The specified product does not exist.');
     }
 
-    // Check if the user is authorized to update the review
+    // Check if the user is authorized to delete the review
     if (String(review.user) !== String(user._id)) {
       throw new AppError(403, 'You are not authorized to delete this review.');
     }
-    // Transatction-1: Update the review with session
+    // Transatction-1: delelte the review with session
     const deletedReview = await Review.deleteOne(
       { _id: reviewId },
       { session },
@@ -198,12 +202,10 @@ const deleteReviewFromDB = async (user: IUser, reviewId: string) => {
       throw new AppError(500, 'Failed to update the review.');
     }
 
-    // Calculate the new rating if it is updated
+    // Calculate the new rating if review is deleted
 
     const updatedTotalRating = product.totalRating - review.rating;
     const updatedRating = updatedTotalRating / (product.totalReviews - 1);
-    console.log('updatedTotalRating----->', updatedTotalRating);
-    console.log('updatedRating----->', updatedRating);
 
     product.totalRating = updatedTotalRating;
     product.rating = Number(updatedRating.toFixed(1));
@@ -229,10 +231,39 @@ const deleteReviewFromDB = async (user: IUser, reviewId: string) => {
   }
 };
 
-export default createReviewIntoDB;
+//Get
+const getAllReviewFromDB = async (user: IUser, productId: string) => {
+  // Fetch both individual and public reviews in a single query
+  const allReviews = await Review.find({ product: productId });
+
+  // Separate user's review and public reviews
+  const yourReview = allReviews.find(
+    (review) => String(review.user) === String(user._id),
+  );
+  const publicReviews = allReviews.filter(
+    (review) => String(review.user) !== String(user._id),
+  );
+
+  return {
+    YourReview: yourReview || null,
+    PublicReview: publicReviews,
+  };
+};
+
+const getReviewDetailsFromDB = async (reviewId: string) => {
+  // Fetch both individual and public reviews in a single query
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    throw new AppError(404, 'Review not found.');
+  }
+
+  return review;
+};
 
 export const ReviewServices = {
   createReviewIntoDB,
   updateReviewFromDB,
   deleteReviewFromDB,
+  getAllReviewFromDB,
+  getReviewDetailsFromDB,
 };
