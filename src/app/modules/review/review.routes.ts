@@ -24,6 +24,6 @@ router
   .get(auth('user'), ReviewController.getReviewDetails);
 router
   .route('/getReview/:productId')
-  .get(auth('user'), ReviewController.getAllReview);
+  .get( ReviewController.getAllReview);
 
 export const ReviewRoute = router;

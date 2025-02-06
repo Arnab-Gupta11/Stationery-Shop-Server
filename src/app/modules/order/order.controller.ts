@@ -44,7 +44,7 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
   }
 });
 const getAllOrdersOfAUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await orderService.getSingleUserAllOrders(req.user);
+  const result = await orderService.getSingleUserAllOrders(req.user, req.query);
   if (result) {
     sendResponse(res, {
       success: true,

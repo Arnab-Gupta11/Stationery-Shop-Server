@@ -1,3 +1,4 @@
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
 import { IUser } from './user.interface';
 import { User } from './user.model';
@@ -12,11 +13,23 @@ const getUserById = async (userId: string, loginUser: IUser) => {
   }
   return user;
 };
-const getAllUsers = async () => {
-  const result = await User.find({ role: { $ne: 'admin' } }).select(
-    '-password',
-  );
-  return result;
+const getAllUsers = async (query: Record<string, unknown>) => {
+  const userQuery = new QueryBuilder(
+    User.find({ role: { $ne: 'admin' } }, '-password').sort({ createdAt: -1 }),
+    query,
+  ).paginate();
+
+  const result = await userQuery.modelQuery;
+  const meta = await userQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+  // const result = await User.find({ role: { $ne: 'admin' } }).select(
+  //   '-password',
+  // );
+  // return result;
 };
 const updateUser = async (
   userId: string,

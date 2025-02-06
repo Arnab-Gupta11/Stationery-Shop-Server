@@ -14,7 +14,7 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.getAllUsers();
+  const result = await UserServices.getAllUsers(req.query);
   sendResponse(res, {
     statusCode: 200,
     success: true,

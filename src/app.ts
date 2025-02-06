@@ -7,10 +7,8 @@ import cors from 'cors';
 const app: Application = express();
 
 const corsOptions = {
-  origin: 'http://localhost:5173', // Allow only your production domain
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allowed HTTP methods
+  origin: ['http://localhost:5173', 'https://notefy-six.vercel.app'], // Allow only your production domain
   credentials: true, // Allow cookies to be sent
-  optionsSuccessStatus: 204, // Some legacy browsers choke on 204
 };
 
 //Middleware to parse incoming JSON request

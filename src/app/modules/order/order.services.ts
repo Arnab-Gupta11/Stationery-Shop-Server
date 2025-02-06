@@ -7,99 +7,6 @@ import { orderUtils } from './order.utils';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { JwtPayload } from 'jsonwebtoken';
 
-// const createNewOrderIntoDB = async (
-//   orderData: TProductsOrder,
-//   user: IUser,
-//   client_ip: string,
-// ) => {
-//   const session = await mongoose.startSession();
-//   session.startTransaction();
-
-//   try {
-//     const { products } = orderData;
-//     let totalOrderPrice = 0;
-//     const updatedProducts = [];
-
-//     for (const item of products) {
-//       const product = await Product.findById(item.product).session(session);
-
-//       if (!product) {
-//         throw new Error(`Product with ID ${item.product} not found.`);
-//       }
-
-//       if (product.quantity < item.quantity) {
-//         throw new Error(
-//           `Only ${product.quantity} items of ${product.name} are available in stock.`,
-//         );
-//       }
-
-//       // Calculate total price for each product
-//       const totalPrice = item.quantity * product.price;
-//       totalOrderPrice += totalPrice;
-
-//       updatedProducts.push({
-//         product: product._id,
-//         quantity: item.quantity,
-//         totalPrice,
-//       });
-
-//       // Update product stock
-//       product.quantity -= item.quantity;
-//       if (product.quantity === 0) {
-//         product.inStock = false;
-//       }
-//       await product.save({ session });
-//     }
-
-//     const orderDetails = {
-//       user: user._id,
-//       products: updatedProducts,
-//       totalOrderPrice,
-//       status: 'Pending',
-//       paymentStatus: 'Pending',
-//     };
-
-//     // Create order in DB
-//     const newOrder: TOrder[] = await Order.create([orderDetails], {
-//       session,
-//     });
-
-//     // ✅ If everything is successful, commit the transaction
-//     await session.commitTransaction();
-//     session.endSession();
-
-//     // payment integration
-//     const shurjopayPayload = {
-//       amount: totalOrderPrice,
-//       order_id: newOrder[0]._id,
-//       currency: 'BDT',
-//       customer_name: user.fullName,
-//       customer_address: user.address,
-//       customer_email: user.email,
-//       customer_phone: user.phone,
-//       customer_city: user.city,
-//       client_ip,
-//     };
-
-//     const payment = await orderUtils.makePaymentAsync(shurjopayPayload);
-//     if (payment?.transactionStatus) {
-//       await Order.updateOne({
-//         transaction: {
-//           id: payment.sp_order_id,
-//           transactionStatus: payment.transactionStatus,
-//         },
-//       });
-//     }
-
-//     return payment.checkout_url;
-//   } catch (error) {
-//     // ❌ If any error occurs, roll back (undo) all changes
-//     await session.abortTransaction();
-//     session.endSession();
-//     throw error;
-//   }
-// };
-
 const createNewOrderIntoDB = async (
   orderData: TProductsOrder,
   user: IUser,
@@ -236,7 +143,8 @@ export const getAllOrders = async (query: Record<string, unknown>) => {
   const orderQuery = new QueryBuilder(
     Order.find()
       .populate('user', 'fullName email')
-      .populate('products.product'),
+      .populate('products.product')
+      .sort({ createdAt: -1 }),
     query,
   ).paginate();
 
@@ -252,14 +160,26 @@ export const getAllOrders = async (query: Record<string, unknown>) => {
   //   .populate('products.product');
 };
 
-const getSingleUserAllOrders = async (user: JwtPayload) => {
-  const orders = await Order.find({ user: user._id })
-    .populate({
-      path: 'products.product',
-    })
-    .sort({ createdAt: -1 }); // Sort orders by most recent
+const getSingleUserAllOrders = async (
+  user: JwtPayload,
+  query: Record<string, unknown>,
+) => {
+  const orderQuery = new QueryBuilder(
+    Order.find({ user: user._id })
+      .populate({
+        path: 'products.product',
+      })
+      .sort({ createdAt: -1 }),
+    query,
+  ).paginate();
 
-  return orders;
+  const result = await orderQuery.modelQuery;
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
 };
 
 const updateOrderStatusIntoDB = async (id: string, updates: object) => {

@@ -29,6 +29,17 @@ It is suitable for building scalable REST APIs and includes the following core m
 
 ## ✨ **Features**
 
+### **Authentication & Authorization**
+
+- **Authentication**:
+
+  - Users must log in to access secured routes for creating, updating, and deleting blogs. The login process uses **JWT (JSON Web Token)** for session management and security.
+  - Passwords are encrypted using **bcrypt** to ensure user credentials are secure.
+
+- **Authorization**:
+  - The system ensures that only users with the appropriate role (Admin or User) can access certain resources and perform specific actions.
+  - Admins have full access to manage users and blogs, while users have access only to their own blogs.
+
 ### **Product Management**
 
 - Add new stationery products.
@@ -62,6 +73,10 @@ It is suitable for building scalable REST APIs and includes the following core m
 │   │   │   ├── order.model.ts
 │   │   │   ├── order.routes.ts
 │   │   │   └── order.services.ts
+│   │   ├── 📦 auth/        # Authentication module
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── auth.routes.ts
+│   │   │   └── auth.services.ts
 │   │   ├── 📦 product/     # Product module
 │   │   │   ├── product.controller.ts
 │   │   │   ├── product.interface.ts
@@ -114,6 +129,20 @@ Create a `.env` file in the project root and configure the following variables:
 ```env
 MONGO_URI=mongodb+srv://<your_mongo_user>:<your_mongo_password>@<your_mongo_cluster>/stationaryShopDB?retryWrites=true&w=majority
 PORT=5000
+NODE_ENV=development
+
+# Token Configuration
+BCRYPT_SALT_ROUNDS=12
+JWT_ACCESS_SECRET=<YOUR_RANDOM_ACCESS_SECRET_KEY>
+JWT_REFRESH_SECRET=<YOUR_RANDOM_REFRESH_SECRET_KEY>
+JWT_ACCESS_EXPIRES_IN=1d
+
+# Payment Gateway Configuration
+SP_ENDPOINT=https://sandbox.shurjopayment.com
+SP_USERNAME=<YOUR_SHURJOPAY_USERNAME>
+SP_PASSWORD=<YOUR_SHURJOPAY_PASSWORD>
+SP_PREFIX=SP
+SP_RETURN_URL=http://localhost:5173/order/verification
 ```
 
 ### **Build the Project**

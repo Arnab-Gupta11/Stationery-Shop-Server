@@ -4,6 +4,7 @@ import { OrderRoutes } from '../modules/order/order.routes';
 import { ProductRoutes } from '../modules/product/product.routes';
 import { UserRoutes } from '../modules/user/user.routes';
 import { ReviewRoute } from '../modules/review/review.routes';
+import { FavouriteRoutes } from '../modules/fovourite/favourite.routes';
 
 const router = Router();
 
@@ -27,6 +28,10 @@ const moduleRoutes = [
   {
     path: '/review',
     route: ReviewRoute,
+  },
+  {
+    path: '/favourite',
+    route: FavouriteRoutes,
   },
 ];
 

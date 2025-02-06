@@ -22,6 +22,7 @@ const loginUser = catchAsync(async (req, res) => {
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: config.node_env === 'production',
+    sameSite: config.node_env === 'production' ? 'none' : 'strict',
     maxAge: 365 * 24 * 60 * 60,
   });
 
@@ -48,7 +49,11 @@ const logout = catchAsync(async (req: Request, res: Response) => {
   }
 
   // Clear the refresh token cookie
-  res.clearCookie('refreshToken');
+  res.clearCookie('refreshToken', {
+    maxAge: 0,
+    secure: config.node_env === 'production',
+    sameSite: config.node_env === 'production' ? 'none' : 'strict',
+  });
 
   // Respond with a success message
   sendResponse(res, {

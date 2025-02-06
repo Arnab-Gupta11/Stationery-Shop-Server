@@ -234,20 +234,21 @@ const deleteReviewFromDB = async (user: IUser, reviewId: string) => {
 //Get
 const getAllReviewFromDB = async (user: IUser, productId: string) => {
   // Fetch both individual and public reviews in a single query
-  const allReviews = await Review.find({ product: productId });
+  const allReviews = await Review.find({ product: productId }).populate('user');
 
   // Separate user's review and public reviews
-  const yourReview = allReviews.find(
-    (review) => String(review.user) === String(user._id),
-  );
-  const publicReviews = allReviews.filter(
-    (review) => String(review.user) !== String(user._id),
-  );
+  // const yourReview = allReviews.find(
+  //   (review) => String(review.user) === String(user._id),
+  // );
+  // const publicReviews = allReviews.filter(
+  //   (review) => String(review.user) !== String(user._id),
+  // );
 
-  return {
-    YourReview: yourReview || null,
-    PublicReview: publicReviews,
-  };
+  // return {
+  //   YourReview: yourReview || null,
+  //   PublicReview: publicReviews,
+  // };
+  return allReviews;
 };
 
 const getReviewDetailsFromDB = async (reviewId: string) => {
