@@ -24,6 +24,8 @@ It is suitable for building scalable REST APIs and includes the following core m
 
 - **Order Module**: Handles order-related operations.
 - **Product Module**: Manages product-related functionalities.
+- **Review Module**: Manages review-related functionalities.
+- **User Module**: Manages user-related functionalities.
 
 ---
 
@@ -33,12 +35,12 @@ It is suitable for building scalable REST APIs and includes the following core m
 
 - **Authentication**:
 
-  - Users must log in to access secured routes for creating, updating, and deleting blogs. The login process uses **JWT (JSON Web Token)** for session management and security.
+  - Admin must log in to access secured routes for creating, updating, and deleting products. The login process uses **JWT (JSON Web Token)** for session management and security.
   - Passwords are encrypted using **bcrypt** to ensure user credentials are secure.
 
 - **Authorization**:
   - The system ensures that only users with the appropriate role (Admin or User) can access certain resources and perform specific actions.
-  - Admins have full access to manage users and blogs, while users have access only to their own blogs.
+  - Admins have full access to manage users, products and order while users have access only to buy product and give review.
 
 ### **Product Management**
 
