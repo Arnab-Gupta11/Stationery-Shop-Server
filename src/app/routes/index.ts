@@ -5,6 +5,7 @@ import { ProductRoutes } from '../modules/product/product.routes';
 import { UserRoutes } from '../modules/user/user.routes';
 import { ReviewRoute } from '../modules/review/review.routes';
 import { FavouriteRoutes } from '../modules/fovourite/favourite.routes';
+import { CategoryRoutes } from '../modules/category/category.routes';
 
 const router = Router();
 
@@ -16,6 +17,10 @@ const moduleRoutes = [
   {
     path: '/user',
     route: UserRoutes,
+  },
+  {
+    path: '/category',
+    route: CategoryRoutes,
   },
   {
     path: '/orders',

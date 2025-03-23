@@ -1,9 +1,17 @@
 import { Router } from 'express';
-import { categoryController } from './category.controller';
+import { CategoryControllers } from './category.controller';
+import auth from '../../middlewares/auth';
+import validateRequest from '../../middlewares/validateRequest';
+import { CategoryValidations } from './category.validation';
 
 const router = Router();
 
 // Define routes
-router.get('/', categoryController.getAll);
+router.post(
+  '/',
+  auth('admin'),
+  validateRequest(CategoryValidations.createCategoryValidationSchema),
+  CategoryControllers.createCategory,
+);
 
-export default router;
+export const CategoryRoutes = router;
