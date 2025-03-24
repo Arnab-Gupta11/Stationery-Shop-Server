@@ -14,7 +14,19 @@ export const createCategory = catchAsync(
     });
   },
 );
+export const getALlCategoryOptions = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await CategoryServices.getAllCategoriesOption();
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Retrived ALl Categories Successfully.',
+      data: result,
+    });
+  },
+);
 
 export const CategoryControllers = {
   createCategory,
+  getALlCategoryOptions,
 };
