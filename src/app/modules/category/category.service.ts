@@ -1,5 +1,7 @@
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
 import { IUser } from '../user/user.interface';
+import { categorySearchableField } from './category.constant';
 
 import { ICategory } from './category.interface';
 import { Category } from './category.model';
@@ -27,22 +29,6 @@ const createCategory = async (
 
 //Get All Category.
 const getAllCategoriesOption = async () => {
-  // const categoryQuery = new QueryBuilder(
-  //   Category.find({ isActive: true }),
-  //   query,
-  // )
-  //   .search(categorySearchableField)
-  //   .filter()
-  //   .sort()
-  //   .paginate();
-  // const categories = await categoryQuery.modelQuery;
-  // const meta = await categoryQuery.countTotal();
-  // const categoryMap = new Map<string, any>();
-  // const hirerchy=[];
-  // categories.forEach((category:ICategory)=>{
-  //    categoryMap.set(category._id.toString(),{...category,})
-  // })
-
   const result = await Category.aggregate([
     {
       $match: {
@@ -78,7 +64,26 @@ const getAllCategoriesOption = async () => {
   return result;
 };
 
+const getAllCategories = async (query: Record<string, unknown>) => {
+  const CategoryQuery = new QueryBuilder(
+    Category.find({ isActive: true }),
+    query,
+  )
+    .sort()
+    .sortOrder()
+    .search(categorySearchableField)
+    .paginate();
+  const result = await CategoryQuery.modelQuery;
+  const meta = await CategoryQuery.countTotal();
+
+  return {
+    result,
+    meta,
+  };
+};
+
 export const CategoryServices = {
   createCategory,
   getAllCategoriesOption,
+  getAllCategories
 };

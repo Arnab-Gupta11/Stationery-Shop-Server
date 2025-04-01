@@ -43,12 +43,19 @@ const categorySchema = new Schema<ICategoryDocument>(
 );
 
 //Generating Slug
-categorySchema.pre<ICategory>('validate', function (next) {
+categorySchema.pre<ICategory>('validate', async function (next) {
   if (this.isModified('name')) {
-    this.slug = this.name
+    const baseSlug = this.name
       .toLocaleLowerCase()
       .replace(/ /g, '-') //Replaces all spaces with -
       .replace(/[^\w-]+/g, ''); //Removes all characters that are not letters, numbers, underscores (_), or hyphens (-).
+    let slug = baseSlug;
+    let counter = 1;
+    while (await Category.exists({ slug })) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+    this.slug = slug;
   }
   next();
 });

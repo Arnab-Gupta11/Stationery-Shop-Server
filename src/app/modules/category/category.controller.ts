@@ -3,6 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import { CategoryServices } from './category.service';
 import sendResponse from '../../utils/sendResponse';
 
+//Create category
 export const createCategory = catchAsync(
   async (req: Request, res: Response) => {
     const result = await CategoryServices.createCategory(req.body, req.user);
@@ -14,6 +15,8 @@ export const createCategory = catchAsync(
     });
   },
 );
+
+//Get category option
 export const getALlCategoryOptions = catchAsync(
   async (req: Request, res: Response) => {
     const result = await CategoryServices.getAllCategoriesOption();
@@ -26,7 +29,21 @@ export const getALlCategoryOptions = catchAsync(
   },
 );
 
+//const getAllCategories
+export const getALlCategory = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await CategoryServices.getAllCategories(req.query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Retrived ALl Categories Successfully.',
+      data: result,
+    });
+  },
+);
+
 export const CategoryControllers = {
   createCategory,
   getALlCategoryOptions,
+  getALlCategory
 };
