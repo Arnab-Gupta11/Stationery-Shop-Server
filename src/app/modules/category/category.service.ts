@@ -101,10 +101,31 @@ const getAllSubCategoryOfACategory = async (parentId: string) => {
   return res;
 };
 
+//Update Category
+const updateCategory = async (
+  categoryId: string,
+  updatedData: Partial<ICategory>,
+) => {
+  const isCategoryExist = await Category.findOne({
+    _id: categoryId,
+    isActive: true,
+  });
+  if (!isCategoryExist) {
+    throw new AppError(404, 'The requested category does not exist');
+  }
+  const res = await Category.findByIdAndUpdate(
+    categoryId,
+    { ...updatedData },
+    { new: true, runValidators: true },
+  );
+  return res;
+};
+
 export const CategoryServices = {
   createCategory,
   getAllCategoriesOption,
   getAllCategories,
   getAllSubCategories,
   getAllSubCategoryOfACategory,
+  updateCategory,
 };

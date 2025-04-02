@@ -29,13 +29,13 @@ router.get(
   CategoryControllers.getALlSubCategoryOfACategory,
 );
 
-// 🔹 Update category by ID
-// router.put(
-//   '/:categoryId',
-//   auth('admin'),
-//   validateRequest(CategoryValidations.updateCategoryValidationSchema),
-//   CategoryControllers.updateCategory
-// );
+// Update category by ID
+router.put(
+  '/:categoryId',
+  auth('admin'),
+  validateRequest(CategoryValidations.updateCategoryValidationSchema),
+  CategoryControllers.updateCategory,
+);
 
 // 🔹 Soft delete category by ID (Marks as deleted, does not remove permanently)
 // router.delete('/:categoryId', auth('admin'), CategoryControllers.softDeleteCategory);

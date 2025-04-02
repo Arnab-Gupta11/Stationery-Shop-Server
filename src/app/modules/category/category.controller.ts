@@ -67,11 +67,25 @@ export const getALlSubCategoryOfACategory = catchAsync(
     });
   },
 );
+//Update category.
+export const updateCategory = catchAsync(
+  async (req: Request, res: Response) => {
+    const { categoryId } = req.params;
+    const result = await CategoryServices.updateCategory(categoryId, req.body);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Category updated successfully.',
+      data: result,
+    });
+  },
+);
 
 export const CategoryControllers = {
   createCategory,
   getALlCategoryOptions,
   getALlCategory,
   getALlSubCategory,
-  getALlSubCategoryOfACategory
+  getALlSubCategoryOfACategory,
+  updateCategory
 };
