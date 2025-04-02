@@ -65,9 +65,28 @@ const updateBrand = async (
   return res;
 };
 
+//Delete Category
+const deleteBrand = async (brandId: string) => {
+  const brand = await Brand.findById(brandId);
+
+  if (!brand) {
+    throw new AppError(404, 'The requested brand does not exist.');
+  }
+
+  // Soft delete by setting isActive to false
+  const result = await Brand.findByIdAndUpdate(
+    brandId,
+    { isActive: false },
+    { new: true },
+  );
+
+  return result;
+};
+
 export const BrandServices = {
   createBrand,
   getAllBrandsByAdmin,
   getAllBrands,
-  updateBrand
+  updateBrand,
+  deleteBrand
 };

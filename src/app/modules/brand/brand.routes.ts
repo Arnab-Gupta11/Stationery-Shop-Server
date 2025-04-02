@@ -23,5 +23,7 @@ router.put(
   validateRequest(BrandValidations.updateBrandValidationSchema),
   BrandControllers.updateBrand,
 );
+// Delete brand by ID
+router.delete('/:brandId', auth('admin'), BrandControllers.deleteBrand);
 
 export const BrandRoutes = router;

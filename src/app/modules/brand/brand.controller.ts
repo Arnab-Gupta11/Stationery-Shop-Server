@@ -36,7 +36,7 @@ const getALlBrands = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-//Update category.
+//Update brand.
 const updateBrand = catchAsync(async (req: Request, res: Response) => {
   const { brandId } = req.params;
   const result = await BrandServices.updateBrand(brandId, req.body);
@@ -48,9 +48,22 @@ const updateBrand = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Delete brand.
+const deleteBrand = catchAsync(async (req: Request, res: Response) => {
+  const { brandId } = req.params;
+  const result = await BrandServices.deleteBrand(brandId);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Brand deleted successfully.',
+    data: result,
+  });
+});
+
 export const BrandControllers = {
   createBrand,
   getALlBrandsByAdmin,
   getALlBrands,
-  updateBrand
+  updateBrand,
+  deleteBrand,
 };
