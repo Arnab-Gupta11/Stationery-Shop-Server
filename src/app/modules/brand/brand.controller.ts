@@ -14,6 +14,29 @@ const createBrand = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Get all Brands for admin dashboard
+const getALlBrandsByAdmin = catchAsync(async (req: Request, res: Response) => {
+  const result = await BrandServices.getAllBrandsByAdmin(req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Retrived ALl Brands Successfully.',
+    data: result,
+  });
+});
+//Get all Brands
+const getALlBrands = catchAsync(async (req: Request, res: Response) => {
+  const result = await BrandServices.getAllBrands();
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Retrived ALl Brands Successfully.',
+    data: result,
+  });
+});
+
 export const BrandControllers = {
   createBrand,
+  getALlBrandsByAdmin,
+  getALlBrands,
 };

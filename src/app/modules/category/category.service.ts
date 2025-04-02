@@ -64,6 +64,7 @@ const getAllCategoriesOption = async () => {
   return result;
 };
 
+//Get all categories
 const getAllCategories = async (query: Record<string, unknown>) => {
   const CategoryQuery = new QueryBuilder(
     Category.find({ isActive: true }),
