@@ -24,6 +24,7 @@ const getALlBrandsByAdmin = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 //Get all Brands
 const getALlBrands = catchAsync(async (req: Request, res: Response) => {
   const result = await BrandServices.getAllBrands();
@@ -35,8 +36,21 @@ const getALlBrands = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Update category.
+const updateBrand = catchAsync(async (req: Request, res: Response) => {
+  const { brandId } = req.params;
+  const result = await BrandServices.updateBrand(brandId, req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Brand updated successfully.',
+    data: result,
+  });
+});
+
 export const BrandControllers = {
   createBrand,
   getALlBrandsByAdmin,
   getALlBrands,
+  updateBrand
 };

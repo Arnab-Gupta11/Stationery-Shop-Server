@@ -15,6 +15,22 @@ const createBrandValidationSchema = z.object({
   }),
 });
 
+//Update Brand validation schema
+const updateBrandValidationSchema = z.object({
+  body: z.object({
+    name: z
+      .string()
+      .max(80, 'Brand name should not exceed 80 characters')
+      .optional(),
+    description: z
+      .string()
+      .max(150, 'Brand name should not exceed 150 characters')
+      .optional(),
+    logo: z.string().optional(),
+  }),
+});
+
 export const BrandValidations = {
   createBrandValidationSchema,
+  updateBrandValidationSchema,
 };

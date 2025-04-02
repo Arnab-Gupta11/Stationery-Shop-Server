@@ -45,8 +45,29 @@ const getAllBrands = async () => {
   return res;
 };
 
+//Update Category
+const updateBrand = async (
+  brandId: string,
+  updatedData: Partial<IBrand>,
+) => {
+  const isBrandExist = await Brand.findOne({
+    _id: brandId,
+    isActive: true,
+  });
+  if (!isBrandExist) {
+    throw new AppError(404, 'The requested brand does not exist');
+  }
+  const res = await Brand.findByIdAndUpdate(
+    brandId,
+    { ...updatedData },
+    { new: true, runValidators: true },
+  );
+  return res;
+};
+
 export const BrandServices = {
   createBrand,
   getAllBrandsByAdmin,
-  getAllBrands
+  getAllBrands,
+  updateBrand
 };

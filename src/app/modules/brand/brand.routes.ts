@@ -16,4 +16,12 @@ router.post(
 router.get('/', BrandControllers.getALlBrands);
 router.get('/admin', auth('admin'), BrandControllers.getALlBrandsByAdmin);
 
+// Update brand by ID
+router.put(
+  '/:brandId',
+  auth('admin'),
+  validateRequest(BrandValidations.updateBrandValidationSchema),
+  BrandControllers.updateBrand,
+);
+
 export const BrandRoutes = router;
