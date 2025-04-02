@@ -23,6 +23,8 @@ const createBrand = async (brandData: Partial<IBrand>, authUser: IUser) => {
   return result;
 };
 
+
+
 //Get all brands by admin
 const getAllBrandsByAdmin = async (query: Record<string, unknown>) => {
   const BrandQuery = new QueryBuilder(Brand.find({ isActive: true }), query)
@@ -39,17 +41,14 @@ const getAllBrandsByAdmin = async (query: Record<string, unknown>) => {
   };
 };
 
-//Get all sub-categories
+//Get all brands
 const getAllBrands = async () => {
   const res = await Brand.find({ isActive: true });
   return res;
 };
 
-//Update Category
-const updateBrand = async (
-  brandId: string,
-  updatedData: Partial<IBrand>,
-) => {
+//Update brand
+const updateBrand = async (brandId: string, updatedData: Partial<IBrand>) => {
   const isBrandExist = await Brand.findOne({
     _id: brandId,
     isActive: true,
@@ -65,7 +64,7 @@ const updateBrand = async (
   return res;
 };
 
-//Delete Category
+//Delete brand
 const deleteBrand = async (brandId: string) => {
   const brand = await Brand.findById(brandId);
 
@@ -83,10 +82,27 @@ const deleteBrand = async (brandId: string) => {
   return result;
 };
 
+//Restor deleted brand
+const restoreBrand = async (brandId: string) => {
+  const brand = await Brand.findById(brandId);
+
+  if (!brand) {
+    throw new AppError(404, 'The requested brand does not exist.');
+  }
+  const result = await Brand.findByIdAndUpdate(
+    brandId,
+    { isActive: true },
+    { new: true },
+  );
+
+  return result;
+};
+
 export const BrandServices = {
   createBrand,
   getAllBrandsByAdmin,
   getAllBrands,
   updateBrand,
-  deleteBrand
+  deleteBrand,
+  restoreBrand,
 };

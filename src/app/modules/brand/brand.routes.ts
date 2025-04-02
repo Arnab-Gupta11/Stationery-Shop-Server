@@ -26,4 +26,7 @@ router.put(
 // Delete brand by ID
 router.delete('/:brandId', auth('admin'), BrandControllers.deleteBrand);
 
+// Restore a deleted brand
+router.put('/:brandId/restore', auth('admin'), BrandControllers.restoreBrand);
+
 export const BrandRoutes = router;

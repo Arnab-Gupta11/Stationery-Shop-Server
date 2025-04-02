@@ -44,7 +44,7 @@ router.delete(
   CategoryControllers.deleteCategory,
 );
 
-// 🔹 Restore a deleted category
+// Restore a deleted category
 router.put(
   '/:categoryId/restore',
   auth('admin'),
