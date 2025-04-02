@@ -22,6 +22,8 @@ router.get('/subcategories', CategoryControllers.getALlSubCategory);
 
 // Get category options (possibly for dropdowns or UI selection)
 router.get('/options', CategoryControllers.getALlCategoryOptions);
+// Get category details by ID
+router.get('/:categoryId', CategoryControllers.getCategoryDetails);
 
 // Get all subcategories of a specific category
 router.get(

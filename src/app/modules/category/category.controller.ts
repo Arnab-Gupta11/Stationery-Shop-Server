@@ -14,6 +14,18 @@ const createCategory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Get category details.
+const getCategoryDetails = catchAsync(async (req: Request, res: Response) => {
+  const { categoryId } = req.params;
+  const result = await CategoryServices.getCategoryDetails(categoryId);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Retrived category details successfully.',
+    data: result,
+  });
+});
+
 //Get category option
 const getALlCategoryOptions = catchAsync(
   async (req: Request, res: Response) => {
@@ -104,4 +116,5 @@ export const CategoryControllers = {
   updateCategory,
   deleteCategory,
   restoreCategory,
+  getCategoryDetails,
 };

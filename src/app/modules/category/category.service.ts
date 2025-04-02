@@ -27,6 +27,18 @@ const createCategory = async (
   return result;
 };
 
+//Get category details
+const getCategoryDetails = async (categoryId: string) => {
+  const category = await Category.findOne({
+    _id: categoryId,
+    isActive: true,
+  });
+  if (!category) {
+    throw new AppError(404, 'The requested category does not exist');
+  }
+  return category;
+};
+
 //Get All Category.
 const getAllCategoriesOption = async () => {
   const result = await Category.aggregate([
@@ -177,4 +189,5 @@ export const CategoryServices = {
   updateCategory,
   deleteCategory,
   restoreCategory,
+  getCategoryDetails,
 };
