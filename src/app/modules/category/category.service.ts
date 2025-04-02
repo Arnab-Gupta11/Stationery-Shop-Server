@@ -150,6 +150,23 @@ const deleteCategory = async (categoryId: string) => {
   return result;
 };
 
+//Restor deleted category
+const restoreCategory = async (categoryId: string) => {
+  const category = await Category.findById(categoryId);
+
+  if (!category) {
+    throw new AppError(404, 'The requested category does not exist.');
+  }
+  // Restore category
+  const result = await Category.findByIdAndUpdate(
+    categoryId,
+    { isActive: true },
+    { new: true },
+  );
+
+  return result;
+};
+
 export const CategoryServices = {
   createCategory,
   getAllCategoriesOption,
@@ -158,4 +175,5 @@ export const CategoryServices = {
   getAllSubCategoryOfACategory,
   updateCategory,
   deleteCategory,
+  restoreCategory,
 };
