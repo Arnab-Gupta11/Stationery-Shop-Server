@@ -44,7 +44,7 @@ export const getALlCategory = catchAsync(
 //Get All  SubCategories
 export const getALlSubCategory = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await CategoryServices.getAllCategories(req.query);
+    const result = await CategoryServices.getAllSubCategories();
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -80,6 +80,19 @@ export const updateCategory = catchAsync(
     });
   },
 );
+//Delete category.
+export const deleteCategory = catchAsync(
+  async (req: Request, res: Response) => {
+    const { categoryId } = req.params;
+    const result = await CategoryServices.deleteCategory(categoryId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Category deleted successfully.',
+      data: result,
+    });
+  },
+);
 
 export const CategoryControllers = {
   createCategory,
@@ -87,5 +100,6 @@ export const CategoryControllers = {
   getALlCategory,
   getALlSubCategory,
   getALlSubCategoryOfACategory,
-  updateCategory
+  updateCategory,
+  deleteCategory,
 };

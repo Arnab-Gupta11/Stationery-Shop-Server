@@ -37,8 +37,12 @@ router.put(
   CategoryControllers.updateCategory,
 );
 
-// 🔹 Soft delete category by ID (Marks as deleted, does not remove permanently)
-// router.delete('/:categoryId', auth('admin'), CategoryControllers.softDeleteCategory);
+// Soft delete category by ID
+router.delete(
+  '/:categoryId',
+  auth('admin'),
+  CategoryControllers.deleteCategory,
+);
 
 // 🔹 Restore a deleted category
 // router.put('/:categoryId/restore', auth('admin'), CategoryControllers.restoreCategory);

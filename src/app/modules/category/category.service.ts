@@ -121,6 +121,35 @@ const updateCategory = async (
   return res;
 };
 
+//Delete Category
+const deleteCategory = async (categoryId: string) => {
+  const category = await Category.findById(categoryId);
+
+  if (!category) {
+    throw new AppError(404, 'The requested category does not exist.');
+  }
+
+  // If the category is a parent category
+  if (!category.parent) {
+    const hasSubCategories = await Category.exists({ parent: categoryId });
+    if (hasSubCategories) {
+      throw new AppError(
+        400,
+        'This category cannot be deleted because it has existing subcategories.',
+      );
+    }
+  }
+
+  // Soft delete by setting isActive to false
+  const result = await Category.findByIdAndUpdate(
+    categoryId,
+    { isActive: false },
+    { new: true },
+  );
+
+  return result;
+};
+
 export const CategoryServices = {
   createCategory,
   getAllCategoriesOption,
@@ -128,4 +157,5 @@ export const CategoryServices = {
   getAllSubCategories,
   getAllSubCategoryOfACategory,
   updateCategory,
+  deleteCategory,
 };
