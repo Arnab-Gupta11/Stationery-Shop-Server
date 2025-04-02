@@ -11,7 +11,7 @@ const brandSchema: Schema = new Schema<IBrand>(
     },
     slug: {
       type: String,
-      required: true,
+      required: [true, 'Brand slug is required'],
       unique: true,
       trim: true,
     },
@@ -28,6 +28,7 @@ const brandSchema: Schema = new Schema<IBrand>(
       type: Boolean,
       default: true,
     },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true },
 );

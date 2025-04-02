@@ -34,6 +34,7 @@ const categorySchema = new Schema<ICategory>(
       type: String,
       trim: true,
     },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   {
     timestamps: true,

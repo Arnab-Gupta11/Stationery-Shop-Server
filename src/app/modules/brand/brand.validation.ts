@@ -1,11 +1,20 @@
 import { z } from 'zod';
 
-export const brandValidation = {
-  create: z.object({
-    name: z.string().min(1, 'Name is required'),
+//Create Brand validation schema
+const createBrandValidationSchema = z.object({
+  body: z.object({
+    name: z
+      .string()
+      .nonempty('Brand name is required')
+      .max(80, 'Brand name should not exceed 80 characters'),
+    description: z
+      .string()
+      .nonempty('Brand description is required')
+      .max(150, 'Brand name should not exceed 150 characters'),
+    logo: z.string().nonempty('Brand Logo is required.'),
   }),
-  update: z.object({
-    id: z.string().uuid('Invalid ID format'),
-    name: z.string().optional(),
-  }),
+});
+
+export const BrandValidations = {
+  createBrandValidationSchema,
 };

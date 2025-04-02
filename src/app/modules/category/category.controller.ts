@@ -9,7 +9,7 @@ const createCategory = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: 'Create Category Successfully.',
+    message: 'Category created  successfully.',
     data: result,
   });
 });
