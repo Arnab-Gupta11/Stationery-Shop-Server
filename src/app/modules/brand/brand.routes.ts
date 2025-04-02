@@ -15,6 +15,7 @@ router.post(
 );
 router.get('/', BrandControllers.getALlBrands);
 router.get('/admin', auth('admin'), BrandControllers.getALlBrandsByAdmin);
+router.get('/:brandId', BrandControllers.getBrandDetails);
 
 // Update brand by ID
 router.put(

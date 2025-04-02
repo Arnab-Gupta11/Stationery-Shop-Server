@@ -23,7 +23,17 @@ const createBrand = async (brandData: Partial<IBrand>, authUser: IUser) => {
   return result;
 };
 
-
+//Get Brand Details
+const getBrandDetails = async (brandId: string) => {
+  const result = await Brand.findOne({
+    _id: brandId,
+    isActive: true,
+  });
+  if (!result) {
+    throw new AppError(404, 'The requested brand does not exist');
+  }
+  return result;
+};
 
 //Get all brands by admin
 const getAllBrandsByAdmin = async (query: Record<string, unknown>) => {
@@ -105,4 +115,5 @@ export const BrandServices = {
   updateBrand,
   deleteBrand,
   restoreBrand,
+  getBrandDetails,
 };

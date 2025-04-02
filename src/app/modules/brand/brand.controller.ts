@@ -14,6 +14,18 @@ const createBrand = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Get Brand Details.
+const getBrandDetails = catchAsync(async (req: Request, res: Response) => {
+  const { brandId } = req.params;
+  const result = await BrandServices.getBrandDetails(brandId);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Retrived brand details successfully.',
+    data: result,
+  });
+});
+
 //Get all Brands for admin dashboard
 const getALlBrandsByAdmin = catchAsync(async (req: Request, res: Response) => {
   const result = await BrandServices.getAllBrandsByAdmin(req.query);
@@ -79,4 +91,5 @@ export const BrandControllers = {
   updateBrand,
   deleteBrand,
   restoreBrand,
+  getBrandDetails,
 };
