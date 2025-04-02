@@ -82,8 +82,29 @@ const getAllCategories = async (query: Record<string, unknown>) => {
   };
 };
 
+//Get all sub-categories
+const getAllSubCategories = async () => {
+  const res = await Category.find({ isActive: true, parent: { $ne: null } });
+  return res;
+};
+
+//Get all sub-categories of a category.
+const getAllSubCategoryOfACategory = async (parentId: string) => {
+  const isParentCategoryExist = await Category.findOne({
+    isActive: true,
+    _id: parentId,
+  });
+  if (!isParentCategoryExist) {
+    throw new AppError(404, "Parent Category doesn't exist.");
+  }
+  const res = await Category.find({ isActive: true, parent: parentId });
+  return res;
+};
+
 export const CategoryServices = {
   createCategory,
   getAllCategoriesOption,
-  getAllCategories
+  getAllCategories,
+  getAllSubCategories,
+  getAllSubCategoryOfACategory,
 };

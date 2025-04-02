@@ -29,7 +29,7 @@ export const getALlCategoryOptions = catchAsync(
   },
 );
 
-//const getAllCategories
+//Get All Categories
 export const getALlCategory = catchAsync(
   async (req: Request, res: Response) => {
     const result = await CategoryServices.getAllCategories(req.query);
@@ -41,9 +41,37 @@ export const getALlCategory = catchAsync(
     });
   },
 );
+//Get All  SubCategories
+export const getALlSubCategory = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await CategoryServices.getAllCategories(req.query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Retrived ALl Sub-Categories Successfully.',
+      data: result,
+    });
+  },
+);
+//Get All  SubCategories of a category.
+export const getALlSubCategoryOfACategory = catchAsync(
+  async (req: Request, res: Response) => {
+    const { parentId } = req.params;
+    const result =
+      await CategoryServices.getAllSubCategoryOfACategory(parentId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Retrived ALl Sub-Categories Successfully.',
+      data: result,
+    });
+  },
+);
 
 export const CategoryControllers = {
   createCategory,
   getALlCategoryOptions,
-  getALlCategory
+  getALlCategory,
+  getALlSubCategory,
+  getALlSubCategoryOfACategory
 };
