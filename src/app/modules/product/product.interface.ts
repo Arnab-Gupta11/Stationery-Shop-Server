@@ -1,19 +1,33 @@
-//Define a Typescript type for a Product.
-export type TProduct = {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Document, Types } from 'mongoose';
+
+export interface IProduct extends Document {
   name: string;
-  brand: string;
-  price: number;
-  category:
-    | 'Writing'
-    | 'Office Supplies'
-    | 'Art Supplies'
-    | 'Educational'
-    | 'Technology';
-  description: string;
+  slug: string;
+  sku: string;
   quantity: number;
+  price: number;
+  offerPrice?: number | null;
+  category: Types.ObjectId;
+  brand: Types.ObjectId;
+  description: string;
+  specification: Record<string, any>;
+  keyFeatures: string[];
   inStock: boolean;
-  image: string;
+  images: string[];
+  isActive: boolean;
+  isFeatured?: boolean;
   rating: number;
   totalReviews: number;
   totalRating: number;
-};
+  weight: number;
+  salesCount?: number;
+  flashSale?: {
+    active: boolean;
+    discountPrice: number;
+    startTime: Date;
+    endTime: Date;
+  };
+  createdAt?: Date;
+  updatedAt?: Date;
+}

@@ -30,7 +30,7 @@ const brandSchema: Schema = new Schema<IBrand>(
     },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
   },
-  { timestamps: true },
+  { timestamps: true, versionKey: false },
 );
 
 // Generate slug before saving

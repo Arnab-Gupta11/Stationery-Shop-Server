@@ -1,52 +1,86 @@
 import { model, Schema } from 'mongoose';
-import { TProduct } from './product.interface';
+import { IProduct } from './product.interface';
 
-//Define a Mongoose schema for the Product model.
-const productSchema = new Schema<TProduct>(
+const productSchema = new Schema<IProduct>(
   {
     name: {
       type: String,
-      required: [true, 'Product Name is required'],
+      required: [true, 'Product name is required.'],
       trim: true,
     },
-    brand: {
+    slug: {
       type: String,
-      required: [true, 'Product Brand is required'],
+      required: [true, 'Product slug is required.'],
+      unique: true,
       trim: true,
     },
-    price: {
-      type: Number,
-      required: [true, 'Product Price is required'],
-      min: [0, 'Product price must be a positive number.'],
-    },
-    category: {
+    sku: {
       type: String,
-      enum: {
-        values: [
-          'Writing',
-          'Office Supplies',
-          'Art Supplies',
-          'Educational',
-          'Technology',
-        ],
-        message:
-          '{VALUE} is not a valid category. Allowed categories are Writing,Office Supplies,Art Supplies,Educational and Technology',
-      },
-      required: [true, 'Product Category is required'],
-    },
-    description: {
-      type: String,
-      required: [true, 'Product Description is required.'],
+      required: [true, 'Product slug is required.'],
+      unique: true,
       trim: true,
     },
     quantity: {
       type: Number,
-      required: [true, 'Product quantity is required'],
-      min: [0, 'Product quantity must be a positive number.'],
+      required: [true, 'Product quantity is required.'],
+      min: 0,
+    },
+    price: {
+      type: Number,
+      required: [true, 'Product price is required.'],
+      min: 0,
+    },
+    offerPrice: {
+      type: Number,
+      default: null,
+      min: 0,
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: [true, 'Product category is required.'],
+    },
+    brand: {
+      type: Schema.Types.ObjectId,
+      ref: 'Brand',
+      required: [true, 'Product brand is required.'],
+    },
+    description: {
+      type: String,
+      required: [true, 'Product description is required.'],
+      trim: true,
+    },
+    specification: {
+      type: Schema.Types.Mixed,
+      required: [true, 'Product specification is required.'],
+      default: {},
+    },
+    keyFeatures: {
+      type: [String],
+      required: [true, 'Product key feature is required.'],
+      default: [],
+    },
+    inStock: {
+      type: Boolean,
+      default: true,
+    },
+    images: {
+      type: [String],
+      required: [true, 'Product image is required.'],
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    isFeatured: {
+      type: Boolean,
+      default: false,
     },
     rating: {
       type: Number,
       default: 0,
+      min: 0,
+      max: 5,
     },
     totalReviews: {
       type: Number,
@@ -56,14 +90,20 @@ const productSchema = new Schema<TProduct>(
       type: Number,
       default: 0,
     },
-    inStock: {
-      type: Boolean,
-      required: [true, 'Product stock is required'],
-      default: true,
+    weight: {
+      type: Number,
+      required: [true, 'Product weight is required.'],
+      default: 0,
     },
-    image: {
-      type: String,
-      required: [true, 'Product image is required'],
+    salesCount: {
+      type: Number,
+      default: 0,
+    },
+    flashSale: {
+      active: { type: Boolean, default: false },
+      discountPrice: { type: Number, min: 0 },
+      startTime: { type: Date },
+      endTime: { type: Date },
     },
   },
   {
@@ -71,5 +111,7 @@ const productSchema = new Schema<TProduct>(
     versionKey: false,
   },
 );
-//Product Model
-export const Product = model<TProduct>('Product', productSchema);
+
+const Product = model<IProduct>('Product', productSchema);
+
+export default Product;
