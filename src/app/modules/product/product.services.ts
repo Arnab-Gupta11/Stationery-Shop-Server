@@ -36,6 +36,27 @@ export const createProduct = async (
   return result;
 };
 
+//Update Product.
+const updateProduct = async (
+  productId: string,
+  updatedData: Partial<IProduct>,
+) => {
+  const isProductExist = await Product.findOne({
+    _id: productId,
+    isActive: true,
+  });
+  if (!isProductExist) {
+    throw new AppError(404, 'The requested product does not exist');
+  }
+  const res = await Product.findByIdAndUpdate(
+    productId,
+    { ...updatedData },
+    { new: true, runValidators: true },
+  );
+  return res;
+};
+
 export const productServices = {
   createProduct,
+  updateProduct,
 };

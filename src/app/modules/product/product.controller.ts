@@ -17,6 +17,21 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
+//update product.
+const updateProduct = catchAsync(async (req: Request, res: Response) => {
+  const updates = req.body;
+  const { productId } = req.params;
+  const result = await productServices.updateProduct(productId, updates);
+  if (result) {
+    sendResponse(res, {
+      success: true,
+      message: 'Product is updated successfully',
+      statusCode: 200,
+      data: result,
+    });
+  }
+});
+
 //get single product.
 // const getSingleProduct = catchAsync(async (req: Request, res: Response) => {
 //   const { productId } = req.params;
@@ -44,20 +59,7 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
 //     });
 //   }
 // });
-//update product.
-// const updateProduct = catchAsync(async (req: Request, res: Response) => {
-//   const updates = req.body;
-//   const { productId } = req.params;
-//   const result = await productServices.updateProductIntoDB(productId, updates);
-//   if (result) {
-//     sendResponse(res, {
-//       success: true,
-//       message: 'Product is updated successfully',
-//       statusCode: 201,
-//       data: result,
-//     });
-//   }
-// });
+
 //delete product.
 // const deleteProduct = catchAsync(async (req: Request, res: Response) => {
 //   const { productId } = req.params;
@@ -74,4 +76,5 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
 // });
 export const productControllers = {
   createProduct,
+  updateProduct,
 };

@@ -9,10 +9,12 @@ router.route('/').post(auth('admin'), productControllers.createProduct);
 
 // router.route('/maxPrice').get(productControllers.getMaximumPrice);
 
-// router
-//   .route('/:productId')
+router
+  .route('/:productId')
+  .put(auth('admin'), productControllers.updateProduct);
+//
 //   .get(productControllers.getSingleProduct)
-//   .put(auth('admin'), productControllers.updateProduct)
+
 //   .delete(auth('admin'), productControllers.deleteProduct);
 
 export const ProductRoutes = router;
