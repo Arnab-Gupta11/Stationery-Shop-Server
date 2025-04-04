@@ -11,10 +11,11 @@ router.route('/').post(auth('admin'), productControllers.createProduct);
 
 router
   .route('/:productId')
-  .put(auth('admin'), productControllers.updateProduct);
+  .put(auth('admin'), productControllers.updateProduct)
+  .delete(auth('admin'), productControllers.deleteProduct);
 //
 //   .get(productControllers.getSingleProduct)
 
-//   .delete(auth('admin'), productControllers.deleteProduct);
+//
 
 export const ProductRoutes = router;

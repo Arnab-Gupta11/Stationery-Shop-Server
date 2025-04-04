@@ -56,7 +56,25 @@ const updateProduct = async (
   return res;
 };
 
+//Delete product
+const deleteProduct = async (productId: string) => {
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    throw new AppError(404, 'The requested product does not exist.');
+  }
+
+  // Soft delete by setting isActive to false
+  const result = await Brand.findByIdAndUpdate(
+    productId,
+    { isActive: false },
+    { new: true },
+  );
+  return result;
+};
+
 export const productServices = {
   createProduct,
   updateProduct,
+  deleteProduct
 };

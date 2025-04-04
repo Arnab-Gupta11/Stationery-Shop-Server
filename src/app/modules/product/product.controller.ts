@@ -32,6 +32,21 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
+//delete product.
+const deleteProduct = catchAsync(async (req: Request, res: Response) => {
+  const { productId } = req.params;
+  const result = await productServices.deleteProduct(productId);
+  //If no product found.
+  if (result) {
+    sendResponse(res, {
+      success: true,
+      message: 'Product is deleted successfully',
+      statusCode: 200,
+      data: result,
+    });
+  }
+});
+
 //get single product.
 // const getSingleProduct = catchAsync(async (req: Request, res: Response) => {
 //   const { productId } = req.params;
@@ -60,21 +75,8 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
 //   }
 // });
 
-//delete product.
-// const deleteProduct = catchAsync(async (req: Request, res: Response) => {
-//   const { productId } = req.params;
-//   const result = await productServices.deleteProductFromDB(productId);
-//   //If no product found.
-//   if (result) {
-//     sendResponse(res, {
-//       success: true,
-//       message: 'Product is deleted successfully',
-//       statusCode: 201,
-//       data: result,
-//     });
-//   }
-// });
 export const productControllers = {
   createProduct,
   updateProduct,
+  deleteProduct,
 };
