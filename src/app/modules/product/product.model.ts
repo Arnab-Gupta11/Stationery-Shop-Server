@@ -1,5 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { IProduct } from './product.interface';
+import { generateSlug } from '../../utils/generateSlug';
+import crypto from 'crypto';
 
 const productSchema = new Schema<IProduct>(
   {
@@ -16,7 +18,6 @@ const productSchema = new Schema<IProduct>(
     },
     sku: {
       type: String,
-      required: [true, 'Product slug is required.'],
       unique: true,
       trim: true,
     },
@@ -112,6 +113,39 @@ const productSchema = new Schema<IProduct>(
   },
 );
 
-const Product = model<IProduct>('Product', productSchema);
+//Pre hook for generate slug
+productSchema.pre<IProduct>('validate', async function (next) {
+  //Generating Slug.
+  if (this.isModified('name')) {
+    const baseSlug = generateSlug(this.name);
+    let slug = baseSlug;
+    let count = 1;
+    while (await Product.exists({ slug })) {
+      slug = `${baseSlug}-${count}`;
+      count++;
+    }
+    this.slug = slug;
+  }
+  next();
+});
 
+//Pre hook for generate sku
+productSchema.pre<IProduct>('save', async function (next) {
+  if (!this.sku) {
+    const base = crypto
+      .createHash('md5')
+      .update(this._id.toString())
+      .digest('hex')
+      .slice(0, 8)
+      .toUpperCase(); // e.g., "D41D8CD9"
+
+    const count = await Product.countDocuments();
+    const productNo = (count + 1).toString().padStart(4, '0'); // e.g., "0001"
+    this.sku = `${base}-${productNo}`;
+  }
+
+  next();
+});
+
+const Product = model<IProduct>('Product', productSchema);
 export default Product;

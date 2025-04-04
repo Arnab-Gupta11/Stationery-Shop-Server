@@ -2,6 +2,7 @@
 import { Document, Types } from 'mongoose';
 
 export interface IProduct extends Document {
+  _id: Types.ObjectId;
   name: string;
   slug: string;
   sku: string;

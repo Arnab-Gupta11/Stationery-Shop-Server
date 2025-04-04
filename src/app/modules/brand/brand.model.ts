@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { IBrand } from './brand.interface';
+import { generateSlug } from '../../utils/generateSlug';
 
 const brandSchema: Schema = new Schema<IBrand>(
   {
@@ -36,10 +37,7 @@ const brandSchema: Schema = new Schema<IBrand>(
 // Generate slug before saving
 brandSchema.pre<IBrand>('validate', async function (next) {
   if (this.isModified('name')) {
-    const baseSlug = this.name
-      .toLocaleLowerCase()
-      .replace(/ /g, '-') //Replaces all spaces with -
-      .replace(/[^\w-]+/g, ''); //Removes all characters that are not letters, numbers, underscores (_), or hyphens (-).
+    const baseSlug = generateSlug(this.name);
     let slug = baseSlug;
     let counter = 1;
     while (await Brand.exists({ slug })) {

@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { ICategory } from './category.interface';
+import { generateSlug } from '../../utils/generateSlug';
 
 // Define the schema
 const categorySchema = new Schema<ICategory>(
@@ -45,10 +46,7 @@ const categorySchema = new Schema<ICategory>(
 //Generating Slug
 categorySchema.pre<ICategory>('validate', async function (next) {
   if (this.isModified('name')) {
-    const baseSlug = this.name
-      .toLocaleLowerCase()
-      .replace(/ /g, '-') //Replaces all spaces with -
-      .replace(/[^\w-]+/g, ''); //Removes all characters that are not letters, numbers, underscores (_), or hyphens (-).
+    const baseSlug = generateSlug(this.name);
     let slug = baseSlug;
     let counter = 1;
     while (await Category.exists({ slug })) {
