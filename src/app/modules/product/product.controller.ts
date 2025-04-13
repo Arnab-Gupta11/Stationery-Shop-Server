@@ -32,6 +32,17 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
+//Get all products
+const getALlProducts = catchAsync(async (req: Request, res: Response) => {
+  const result = await productServices.getAllProducts(req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Retrived all products successfully.',
+    meta: result.meta,
+    data: result.result,
+  });
+});
 //delete product.
 const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   const { productId } = req.params;
@@ -61,22 +72,9 @@ const deleteProduct = catchAsync(async (req: Request, res: Response) => {
 //   }
 // });
 
-//get all product.
-// const getAllProducts = catchAsync(async (req: Request, res: Response) => {
-//   const result = await productServices.getAllProductFromDB(req.query);
-//   if (result) {
-//     sendResponse(res, {
-//       success: true,
-//       message: 'Retrieved all product successfully',
-//       statusCode: 200,
-//       meta: result.meta,
-//       data: result.result,
-//     });
-//   }
-// });
-
 export const productControllers = {
   createProduct,
   updateProduct,
   deleteProduct,
+  getALlProducts,
 };

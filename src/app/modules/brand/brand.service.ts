@@ -108,6 +108,22 @@ const restoreBrand = async (brandId: string) => {
   return result;
 };
 
+//Get all deleted brands.
+const getAllDeletedBrands = async (query: Record<string, unknown>) => {
+  const BrandQuery = new QueryBuilder(Brand.find({ isActive: false }), query)
+    .sort()
+    .sortOrder()
+    .search(brandSearchableField)
+    .paginate();
+  const result = await BrandQuery.modelQuery;
+  const meta = await BrandQuery.countTotal();
+
+  return {
+    result,
+    meta,
+  };
+};
+
 export const BrandServices = {
   createBrand,
   getAllBrandsByAdmin,
@@ -116,4 +132,5 @@ export const BrandServices = {
   deleteBrand,
   restoreBrand,
   getBrandDetails,
+  getAllDeletedBrands,
 };

@@ -15,6 +15,11 @@ router.post(
 );
 router.get('/', BrandControllers.getALlBrands);
 router.get('/admin', auth('admin'), BrandControllers.getALlBrandsByAdmin);
+router.get(
+  '/deleted-brands',
+  auth('admin'),
+  BrandControllers.getALlDeletedBrands,
+);
 router.get('/:brandId', BrandControllers.getBrandDetails);
 
 // Update brand by ID

@@ -4,8 +4,10 @@ import auth from '../../middlewares/auth';
 const router = express.Router();
 
 //Routes for handling product related operation.
-router.route('/').post(auth('admin'), productControllers.createProduct);
-// .get(productControllers.getAllProducts);
+router
+  .route('/')
+  .post(auth('admin'), productControllers.createProduct)
+  .get(productControllers.getALlProducts);
 
 // router.route('/maxPrice').get(productControllers.getMaximumPrice);
 

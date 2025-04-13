@@ -33,7 +33,8 @@ const getALlBrandsByAdmin = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'Retrived ALl Brands Successfully.',
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 
@@ -84,6 +85,18 @@ const restoreBrand = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Get all Brands for admin dashboard
+const getALlDeletedBrands = catchAsync(async (req: Request, res: Response) => {
+  const result = await BrandServices.getAllDeletedBrands(req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Retrived ALl Deleted Brands Successfully.',
+    meta: result.meta,
+    data: result.result,
+  });
+});
+
 export const BrandControllers = {
   createBrand,
   getALlBrandsByAdmin,
@@ -92,4 +105,5 @@ export const BrandControllers = {
   deleteBrand,
   restoreBrand,
   getBrandDetails,
+  getALlDeletedBrands,
 };

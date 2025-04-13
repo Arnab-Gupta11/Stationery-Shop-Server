@@ -1,6 +1,8 @@
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
 import Brand from '../brand/brand.model';
 import { Category } from '../category/category.model';
+import { productSearchableFields } from './product.constant';
 import { IProduct } from './product.interface';
 import Product from './product.model';
 
@@ -34,6 +36,23 @@ export const createProduct = async (
   const product = new Product(productData);
   const result = await product.save();
   return result;
+};
+//Get all products
+const getAllProducts = async (query: Record<string, unknown>) => {
+  const ProductQuery = new QueryBuilder(Product.find({ isActive: true }), query)
+    .sort()
+    .sortOrder()
+    .filter()
+    .filterByPrice(100000000)
+    .search(productSearchableFields)
+    .paginate();
+  const result = await ProductQuery.modelQuery;
+  const meta = await ProductQuery.countTotal();
+
+  return {
+    result,
+    meta,
+  };
 };
 
 //Update Product.
@@ -76,5 +95,6 @@ const deleteProduct = async (productId: string) => {
 export const productServices = {
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  getAllProducts,
 };
