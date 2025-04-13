@@ -180,6 +180,25 @@ const restoreCategory = async (categoryId: string) => {
   return result;
 };
 
+//Get all deleted category.
+const getAllDeletedCategories = async (query: Record<string, unknown>) => {
+  const CategoryQuery = new QueryBuilder(
+    Category.find({ isActive: false }),
+    query,
+  )
+    .sort()
+    .sortOrder()
+    .search(categorySearchableField)
+    .paginate();
+  const result = await CategoryQuery.modelQuery;
+  const meta = await CategoryQuery.countTotal();
+
+  return {
+    result,
+    meta,
+  };
+};
+
 export const CategoryServices = {
   createCategory,
   getAllCategoriesOption,
@@ -190,4 +209,5 @@ export const CategoryServices = {
   deleteCategory,
   restoreCategory,
   getCategoryDetails,
+  getAllDeletedCategories,
 };

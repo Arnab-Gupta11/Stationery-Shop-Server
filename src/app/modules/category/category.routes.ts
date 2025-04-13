@@ -21,7 +21,12 @@ router.get('/', CategoryControllers.getALlCategory);
 router.get('/subcategories', CategoryControllers.getALlSubCategory);
 
 // Get category options (possibly for dropdowns or UI selection)
-router.get('/options', CategoryControllers.getALlCategoryOptions);
+router.get('/category-options', CategoryControllers.getALlCategoryOptions);
+router.get(
+  '/deleted-categories',
+  auth('admin'),
+  CategoryControllers.getALlDeletedCategory,
+);
 // Get category details by ID
 router.get('/:categoryId', CategoryControllers.getCategoryDetails);
 

@@ -46,7 +46,8 @@ const getALlCategory = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'Retrived ALl Categories Successfully.',
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 //Get All  SubCategories
@@ -107,6 +108,20 @@ const restoreCategory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Get all deleted Categories
+const getALlDeletedCategory = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await CategoryServices.getAllDeletedCategories(req.query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Retrived ALl Categories Successfully.',
+      meta: result.meta,
+      data: result.result,
+    });
+  },
+);
+
 export const CategoryControllers = {
   createCategory,
   getALlCategoryOptions,
@@ -117,4 +132,5 @@ export const CategoryControllers = {
   deleteCategory,
   restoreCategory,
   getCategoryDetails,
+  getALlDeletedCategory,
 };
