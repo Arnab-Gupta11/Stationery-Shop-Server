@@ -39,7 +39,10 @@ export const createProduct = async (
 };
 //Get all products
 const getAllProducts = async (query: Record<string, unknown>) => {
-  const ProductQuery = new QueryBuilder(Product.find({ isActive: true }), query)
+  const ProductQuery = new QueryBuilder(
+    Product.find({ isActive: true }).populate('category').populate('brand'),
+    query,
+  )
     .sort()
     .sortOrder()
     .filter()
@@ -53,6 +56,20 @@ const getAllProducts = async (query: Record<string, unknown>) => {
     result,
     meta,
   };
+};
+
+//Get Brand Details
+const getProdactDetails = async (productId: string) => {
+  const result = await Product.findOne({
+    _id: productId,
+    isActive: true,
+  })
+    .populate('category')
+    .populate('brand');
+  if (!result) {
+    throw new AppError(404, 'The requested product does not exist');
+  }
+  return result;
 };
 
 //Update Product.
@@ -97,4 +114,5 @@ export const productServices = {
   updateProduct,
   deleteProduct,
   getAllProducts,
+  getProdactDetails,
 };

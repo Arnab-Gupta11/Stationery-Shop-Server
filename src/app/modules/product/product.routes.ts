@@ -14,10 +14,7 @@ router
 router
   .route('/:productId')
   .put(auth('admin'), productControllers.updateProduct)
-  .delete(auth('admin'), productControllers.deleteProduct);
-//
-//   .get(productControllers.getSingleProduct)
-
-//
+  .delete(auth('admin'), productControllers.deleteProduct)
+  .get(productControllers.getProductDetails);
 
 export const ProductRoutes = router;
