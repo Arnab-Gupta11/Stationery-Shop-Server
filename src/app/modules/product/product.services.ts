@@ -101,7 +101,7 @@ const deleteProduct = async (productId: string) => {
   }
 
   // Soft delete by setting isActive to false
-  const result = await Brand.findByIdAndUpdate(
+  const result = await Product.findByIdAndUpdate(
     productId,
     { isActive: false },
     { new: true },
