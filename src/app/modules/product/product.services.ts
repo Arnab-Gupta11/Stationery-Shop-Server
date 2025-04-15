@@ -109,10 +109,30 @@ const deleteProduct = async (productId: string) => {
   return result;
 };
 
+//Get all deleted products.
+const getAllDeletedProducts = async (query: Record<string, unknown>) => {
+  const PoductQuery = new QueryBuilder(
+    Product.find({ isActive: false }).populate('category').populate('brand'),
+    query,
+  )
+    .sort()
+    .sortOrder()
+    .search(productSearchableFields)
+    .paginate();
+  const result = await PoductQuery.modelQuery;
+  const meta = await PoductQuery.countTotal();
+
+  return {
+    result,
+    meta,
+  };
+};
+
 export const productServices = {
   createProduct,
   updateProduct,
   deleteProduct,
   getAllProducts,
   getProdactDetails,
+  getAllDeletedProducts
 };

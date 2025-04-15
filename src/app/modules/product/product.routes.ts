@@ -8,6 +8,11 @@ router
   .route('/')
   .post(auth('admin'), productControllers.createProduct)
   .get(productControllers.getALlProducts);
+router.get(
+  '/deleted-products',
+  auth('admin'),
+  productControllers.getALlDeletedProducts,
+);
 
 // router.route('/maxPrice').get(productControllers.getMaximumPrice);
 
