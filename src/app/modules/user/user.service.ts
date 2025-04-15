@@ -26,10 +26,6 @@ const getAllUsers = async (query: Record<string, unknown>) => {
     meta,
     result,
   };
-  // const result = await User.find({ role: { $ne: 'admin' } }).select(
-  //   '-password',
-  // );
-  // return result;
 };
 const updateUser = async (
   userId: string,

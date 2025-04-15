@@ -7,6 +7,7 @@ import { ReviewRoute } from '../modules/review/review.routes';
 import { FavouriteRoutes } from '../modules/fovourite/favourite.routes';
 import { CategoryRoutes } from '../modules/category/category.routes';
 import { BrandRoutes } from '../modules/brand/brand.routes';
+import { BlogRoutes } from '../modules/blog/blog.routes';
 
 const router = Router();
 
@@ -42,6 +43,10 @@ const moduleRoutes = [
   {
     path: '/favourite',
     route: FavouriteRoutes,
+  },
+  {
+    path: '/blogs',
+    route: BlogRoutes,
   },
 ];
 

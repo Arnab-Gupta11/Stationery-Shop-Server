@@ -19,7 +19,8 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'Fetch All User successfully',
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 
@@ -32,7 +33,7 @@ const updateUserInfo = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'User Data Updated successfully',
+    message: 'User status updated successfully',
     data: updatedUser,
   });
 });
