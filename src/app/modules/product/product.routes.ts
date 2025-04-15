@@ -21,5 +21,10 @@ router
   .put(auth('admin'), productControllers.updateProduct)
   .delete(auth('admin'), productControllers.deleteProduct)
   .get(productControllers.getProductDetails);
-
+// Restore a deleted product
+router.put(
+  '/:productId/restore',
+  auth('admin'),
+  productControllers.restoreProduct,
+);
 export const ProductRoutes = router;

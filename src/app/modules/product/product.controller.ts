@@ -81,6 +81,18 @@ const getALlDeletedProducts = catchAsync(
   },
 );
 
+//Restore product.
+const restoreProduct = catchAsync(async (req: Request, res: Response) => {
+  const { productId } = req.params;
+  const result = await productServices.restoreProduct(productId);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Product has been successfully restored.',
+    data: result,
+  });
+});
+
 export const productControllers = {
   createProduct,
   updateProduct,
@@ -88,4 +100,5 @@ export const productControllers = {
   getALlProducts,
   getProductDetails,
   getALlDeletedProducts,
+  restoreProduct,
 };

@@ -128,11 +128,28 @@ const getAllDeletedProducts = async (query: Record<string, unknown>) => {
   };
 };
 
+//Restore deleted products
+const restoreProduct = async (productId: string) => {
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    throw new AppError(404, 'The requested product does not exist.');
+  }
+  const result = await Product.findByIdAndUpdate(
+    productId,
+    { isActive: true },
+    { new: true },
+  );
+
+  return result;
+};
+
 export const productServices = {
   createProduct,
   updateProduct,
   deleteProduct,
   getAllProducts,
   getProdactDetails,
-  getAllDeletedProducts
+  getAllDeletedProducts,
+  restoreProduct,
 };
