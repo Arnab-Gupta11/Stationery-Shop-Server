@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import AppError from '../../errors/AppError';
-import { Product } from '../product/product.model';
 import { IUser } from '../user/user.interface';
 import { TReviewPayload } from './review.interface';
 import { Review } from './review.model';
+import Product from '../product/product.model';
 
 //Create
 const createReviewIntoDB = async (user: IUser, payload: TReviewPayload) => {
@@ -204,12 +204,18 @@ const deleteReviewFromDB = async (user: IUser, reviewId: string) => {
 
     // Calculate the new rating if review is deleted
 
+    // Calculate the new rating after deletion
+    const remainingReviews = product.totalReviews - 1;
     const updatedTotalRating = product.totalRating - review.rating;
-    const updatedRating = updatedTotalRating / (product.totalReviews - 1);
+
+    let updatedRating = 0;
+    if (remainingReviews > 0) {
+      updatedRating = updatedTotalRating / remainingReviews;
+    }
 
     product.totalRating = updatedTotalRating;
     product.rating = Number(updatedRating.toFixed(1));
-    product.totalReviews = product.totalReviews - 1;
+    product.totalReviews = remainingReviews;
 
     // Save product with session
     const savedProduct = await product.save({ session });

@@ -22,7 +22,7 @@ export interface IProduct extends Document {
   totalReviews: number;
   totalRating: number;
   weight: number;
-  salesCount?: number;
+  salesCount: number;
   flashSale?: {
     active: boolean;
     discountPrice: number;

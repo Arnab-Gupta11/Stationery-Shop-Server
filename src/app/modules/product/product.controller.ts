@@ -18,8 +18,8 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
 });
 //Get Proper Details.
 const getProductDetails = catchAsync(async (req: Request, res: Response) => {
-  const { productId } = req.params;
-  const result = await productServices.getProdactDetails(productId);
+  const { identifier } = req.params;
+  const result = await productServices.getProdactDetails(identifier);
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -93,6 +93,19 @@ const restoreProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Get all trending products
+const getAllTrendingProducts = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await productServices.getAllTrendingProducts();
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Retrived all trending products successfully.',
+      data: result,
+    });
+  },
+);
+
 export const productControllers = {
   createProduct,
   updateProduct,
@@ -101,4 +114,5 @@ export const productControllers = {
   getProductDetails,
   getALlDeletedProducts,
   restoreProduct,
+  getAllTrendingProducts,
 };

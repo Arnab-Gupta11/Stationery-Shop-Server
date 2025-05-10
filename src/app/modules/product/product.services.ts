@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
 import Brand from '../brand/brand.model';
@@ -58,12 +60,18 @@ const getAllProducts = async (query: Record<string, unknown>) => {
   };
 };
 
-//Get Brand Details
-const getProdactDetails = async (productId: string) => {
-  const result = await Product.findOne({
-    _id: productId,
+//Get Product Details
+const getProdactDetails = async (identifier: string) => {
+  const validId = mongoose.Types.ObjectId.isValid(identifier);
+  const query: any = {
+    $or: [{ slug: identifier }],
     isActive: true,
-  })
+  };
+
+  if (validId) {
+    query.$or.push({ _id: identifier });
+  }
+  const result = await Product.findOne(query)
     .populate('category')
     .populate('brand');
   if (!result) {
@@ -144,6 +152,20 @@ const restoreProduct = async (productId: string) => {
   return result;
 };
 
+//Get all trending products
+const getAllTrendingProducts = async () => {
+  const result = Product.find({
+    salesCount: { $gt: 0 },
+    inStock: true,
+    isActive: true,
+  })
+    .populate({ path: 'category', select: 'name' })
+    .populate({ path: 'brand', select: 'name' })
+    .sort({ salesCount: -1 })
+    .limit(6);
+  return result;
+};
+
 export const productServices = {
   createProduct,
   updateProduct,
@@ -152,4 +174,5 @@ export const productServices = {
   getProdactDetails,
   getAllDeletedProducts,
   restoreProduct,
+  getAllTrendingProducts,
 };

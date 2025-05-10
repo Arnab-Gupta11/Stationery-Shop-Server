@@ -39,7 +39,8 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
       success: true,
       message: 'All Orders retrived successfully',
       statusCode: 200,
-      data: result,
+      meta: result.meta,
+      data: result.result,
     });
   }
 });
@@ -50,7 +51,8 @@ const getAllOrdersOfAUser = catchAsync(async (req: Request, res: Response) => {
       success: true,
       message: 'All Orders retrived successfully',
       statusCode: 200,
-      data: result,
+      meta: result.meta,
+      data: result.result,
     });
   }
 });

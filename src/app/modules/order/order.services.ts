@@ -1,4 +1,3 @@
-import { Product } from '../product/product.model';
 import { TProductsOrder } from './order.interface';
 import { Order } from './order.model';
 import mongoose from 'mongoose';
@@ -6,6 +5,7 @@ import { IUser } from '../user/user.interface';
 import { orderUtils } from './order.utils';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { JwtPayload } from 'jsonwebtoken';
+import Product from '../product/product.model';
 
 const createNewOrderIntoDB = async (
   orderData: TProductsOrder,
@@ -45,6 +45,7 @@ const createNewOrderIntoDB = async (
 
       // Update product stock
       product.quantity -= item.quantity;
+      product.salesCount += item.quantity;
       if (product.quantity === 0) {
         product.inStock = false;
       }
@@ -143,7 +144,14 @@ export const getAllOrders = async (query: Record<string, unknown>) => {
   const orderQuery = new QueryBuilder(
     Order.find()
       .populate('user', 'fullName email')
-      .populate('products.product')
+      .populate({
+        path: 'products.product',
+        select: 'name price category brand offerPrice images',
+        populate: [
+          { path: 'category', select: 'name' },
+          { path: 'brand', select: 'name' },
+        ],
+      })
       .sort({ createdAt: -1 }),
     query,
   ).paginate();
@@ -168,6 +176,11 @@ const getSingleUserAllOrders = async (
     Order.find({ user: user._id })
       .populate({
         path: 'products.product',
+        select: 'name price category brand offerPrice images',
+        populate: [
+          { path: 'category', select: 'name' },
+          { path: 'brand', select: 'name' },
+        ],
       })
       .sort({ createdAt: -1 }),
     query,

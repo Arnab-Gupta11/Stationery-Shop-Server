@@ -13,14 +13,15 @@ router.get(
   auth('admin'),
   productControllers.getALlDeletedProducts,
 );
+router.get('/trending-products', productControllers.getAllTrendingProducts);
 
 // router.route('/maxPrice').get(productControllers.getMaximumPrice);
 
 router
   .route('/:productId')
   .put(auth('admin'), productControllers.updateProduct)
-  .delete(auth('admin'), productControllers.deleteProduct)
-  .get(productControllers.getProductDetails);
+  .delete(auth('admin'), productControllers.deleteProduct);
+router.route('/params/:identifier').get(productControllers.getProductDetails);
 // Restore a deleted product
 router.put(
   '/:productId/restore',
