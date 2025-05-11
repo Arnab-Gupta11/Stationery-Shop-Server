@@ -17,8 +17,10 @@ router.get('/trending-products', productControllers.getAllTrendingProducts);
 router.get('/top-rated-products', productControllers.getTopRatedProducts);
 router.put(
   '/fetured-product/:productId',
+  auth('admin'),
   productControllers.updateFeaturedProductStatus,
 );
+router.get('/fetured-product', productControllers.getAllFeturedProducts);
 
 // router.route('/maxPrice').get(productControllers.getMaximumPrice);
 

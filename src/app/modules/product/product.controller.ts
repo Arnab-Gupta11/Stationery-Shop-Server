@@ -131,6 +131,18 @@ const updateFeaturedProductStatus = catchAsync(
   },
 );
 
+const getAllFeturedProducts = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await productServices.getAllFeaturedProductFromDB();
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Featured Products fetched successfully',
+      data: result,
+    });
+  },
+);
+
 export const productControllers = {
   createProduct,
   updateProduct,
@@ -142,4 +154,5 @@ export const productControllers = {
   getAllTrendingProducts,
   getTopRatedProducts,
   updateFeaturedProductStatus,
+  getAllFeturedProducts,
 };

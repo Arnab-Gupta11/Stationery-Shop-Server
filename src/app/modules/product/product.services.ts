@@ -199,6 +199,21 @@ const updateFeaturedProductStatusIntoDB = async (id: string) => {
   return updatedFeaturedProduct;
 };
 
+//Get All Featured Product from db
+const getAllFeaturedProductFromDB = async () => {
+  const featuredProducts = await Product.find({
+    isFeatured: true,
+    isActive: true,
+  }).limit(8);
+  let allProducts: IProduct[] = [];
+  if (featuredProducts.length < 8) {
+    allProducts = await Product.find({ isFeatured: false, isActive: true })
+      .sort({ createdAt: -1 })
+      .limit(8 - featuredProducts.length);
+  }
+  const result = [...featuredProducts, ...allProducts];
+  return result;
+};
 export const productServices = {
   createProduct,
   updateProduct,
@@ -210,4 +225,5 @@ export const productServices = {
   getAllTrendingProducts,
   getTopRatedProducts,
   updateFeaturedProductStatusIntoDB,
+  getAllFeaturedProductFromDB,
 };
