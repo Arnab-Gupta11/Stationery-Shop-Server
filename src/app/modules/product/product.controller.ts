@@ -131,6 +131,7 @@ const updateFeaturedProductStatus = catchAsync(
   },
 );
 
+//Get all featured products.
 const getAllFeturedProducts = catchAsync(
   async (req: Request, res: Response) => {
     const result = await productServices.getAllFeaturedProductFromDB();
@@ -139,6 +140,24 @@ const getAllFeturedProducts = catchAsync(
       success: true,
       message: 'Featured Products fetched successfully',
       data: result,
+    });
+  },
+);
+
+//Get all products of a category.
+const getAllProductsOfACategory = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await productServices.getAllProductsOfACategory(
+      id,
+      req.query,
+    );
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'All Products of a category fetched successfully',
+      meta: result.meta,
+      data: result.result,
     });
   },
 );
@@ -155,4 +174,5 @@ export const productControllers = {
   getTopRatedProducts,
   updateFeaturedProductStatus,
   getAllFeturedProducts,
+  getAllProductsOfACategory,
 };

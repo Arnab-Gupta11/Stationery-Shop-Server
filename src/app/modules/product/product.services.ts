@@ -214,6 +214,36 @@ const getAllFeaturedProductFromDB = async () => {
   const result = [...featuredProducts, ...allProducts];
   return result;
 };
+
+//Get all products of a category.
+const getAllProductsOfACategory = async (
+  parenetCategoryId: string,
+  query: Record<string, unknown>,
+) => {
+  const childCategories = await Category.find({
+    parent: parenetCategoryId,
+  }).lean();
+  const child = childCategories.map((item) => item._id);
+  const productQuery = new QueryBuilder(
+    Product.find({ category: { $in: [...child] }, isActive: true })
+      .populate('category')
+      .populate('brand'),
+    query,
+  )
+    .sort()
+    .sortOrder()
+    .filter()
+    .filterByPrice(100000000)
+    .search(productSearchableFields)
+    .paginate();
+  const result = await productQuery.modelQuery;
+  const meta = await productQuery.countTotal();
+
+  return {
+    result,
+    meta,
+  };
+};
 export const productServices = {
   createProduct,
   updateProduct,
@@ -226,4 +256,5 @@ export const productServices = {
   getTopRatedProducts,
   updateFeaturedProductStatusIntoDB,
   getAllFeaturedProductFromDB,
+  getAllProductsOfACategory,
 };

@@ -21,6 +21,7 @@ router.put(
   productControllers.updateFeaturedProductStatus,
 );
 router.get('/fetured-product', productControllers.getAllFeturedProducts);
+router.get('/category/:id', productControllers.getAllProductsOfACategory);
 
 // router.route('/maxPrice').get(productControllers.getMaximumPrice);
 
