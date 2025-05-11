@@ -106,6 +106,31 @@ const getAllTrendingProducts = catchAsync(
   },
 );
 
+//Get top rated products
+const getTopRatedProducts = catchAsync(async (req: Request, res: Response) => {
+  const result = await productServices.getTopRatedProducts();
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Retrived top rated products successfully.',
+    data: result,
+  });
+});
+//Update Fetured product status
+const updateFeaturedProductStatus = catchAsync(
+  async (req: Request, res: Response) => {
+    const { productId } = req.params;
+    const result =
+      await productServices.updateFeaturedProductStatusIntoDB(productId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Product Status Updated Successfully.',
+      data: result,
+    });
+  },
+);
+
 export const productControllers = {
   createProduct,
   updateProduct,
@@ -115,4 +140,6 @@ export const productControllers = {
   getALlDeletedProducts,
   restoreProduct,
   getAllTrendingProducts,
+  getTopRatedProducts,
+  updateFeaturedProductStatus,
 };

@@ -166,6 +166,39 @@ const getAllTrendingProducts = async () => {
   return result;
 };
 
+//get top rated products
+const getTopRatedProducts = async () => {
+  const result = Product.find({
+    rating: { $gt: 3 },
+    inStock: true,
+    isActive: true,
+  })
+    .populate({ path: 'category', select: 'name' })
+    .populate({ path: 'brand', select: 'name' })
+    .sort({ rating: -1, totalReviews: -1 })
+    .limit(6);
+  return result;
+};
+
+//Update fetured product status
+const updateFeaturedProductStatusIntoDB = async (id: string) => {
+  // Find the project first
+  const product = await Product.findById(id);
+
+  if (!product) {
+    throw new AppError(404, 'Product not found');
+  }
+
+  // Toggle the `isFeatured` value
+  const updatedFeaturedProduct = await Product.findByIdAndUpdate(
+    id,
+    { $set: { isFeatured: !product.isFeatured } }, // Properly toggles the boolean value
+    { new: true, runValidators: true },
+  );
+
+  return updatedFeaturedProduct;
+};
+
 export const productServices = {
   createProduct,
   updateProduct,
@@ -175,4 +208,6 @@ export const productServices = {
   getAllDeletedProducts,
   restoreProduct,
   getAllTrendingProducts,
+  getTopRatedProducts,
+  updateFeaturedProductStatusIntoDB,
 };
