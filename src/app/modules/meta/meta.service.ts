@@ -5,11 +5,11 @@ import Product from '../product/product.model';
 import { User } from '../user/user.model';
 import { TOrder } from '../order/order.interface';
 import { IUser } from '../user/user.interface';
+import { Review } from '../review/review.model';
 
 const getMetadata = async (authUser: IUser) => {
   if (authUser.role === 'admin') {
     const totalProducts = await Product.estimatedDocumentCount();
-    const totalCategories = await Category.estimatedDocumentCount();
     const totalBrands = await Brand.estimatedDocumentCount();
     const totalUsers = await User.estimatedDocumentCount();
     const totalOrders = await Order.estimatedDocumentCount();
@@ -18,6 +18,11 @@ const getMetadata = async (authUser: IUser) => {
       (acc, order) => acc + order.totalOrderPrice,
       0,
     );
+    const totalCategories = await Category.countDocuments({ parent: null });
+    const totalSubCategories = await Category.countDocuments({
+      parent: { $ne: null },
+    });
+    const totalReviews = await Review.estimatedDocumentCount();
 
     //Get latest 5 orders.
     const latestOrders = await Order.aggregate([
@@ -93,16 +98,83 @@ const getMetadata = async (authUser: IUser) => {
     return {
       stateData: {
         totalCategories,
+        totalSubCategories,
         totalUsers,
         totalProducts,
         totalBrands,
         totalOrders,
         totalIncome,
+        totalReviews,
       },
       latestOrders,
       latestUsers,
       getProductDistributionByParentCategory,
       getTopProducts,
+    };
+  } else {
+    const totalOrders = await Order.countDocuments({ user: authUser._id });
+    const totalReviews = await Review.countDocuments({ user: authUser._id });
+    const orders = (await Order.find({
+      user: authUser._id,
+    }).lean()) as TOrder[];
+    const totalPayments = orders.reduce(
+      (acc, order) => acc + order.totalOrderPrice,
+      0,
+    );
+    const totalPurchasedProducts = orders.reduce(
+      (acc, order) => acc + order.products.length,
+      0,
+    );
+    //Get latest 5 orders.
+    const latestOrders = await Order.aggregate([
+      {
+        $match: { user: authUser._id },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'userData',
+        },
+      },
+      {
+        $unwind: '$userData',
+      },
+      {
+        $project: {
+          orderId: '$transaction.id',
+          userName: '$userData.name',
+          totalProductsCount: { $size: '$products' },
+          totalOrderPrice: 1,
+          paymentStatus: 1,
+          orderStatus: '$status',
+          orderPlaced: '$createdAt',
+        },
+      },
+    ]);
+
+    //User states chart data.
+    const max =
+      Math.max(totalPayments, totalPurchasedProducts, totalPayments) || 1;
+
+    const userStatesChart = [
+      { name: 'Total Payments', value: totalPayments / max || 0 },
+      { name: 'Total Orders', value: totalOrders / max || 0 },
+      {
+        name: 'Total Purchased Products',
+        value: totalPurchasedProducts / max || 0,
+      },
+    ];
+    return {
+      stateData: {
+        totalOrders,
+        totalPayments,
+        totalReviews,
+        totalPurchasedProducts,
+      },
+      userStatesChart,
+      latestOrders,
     };
   }
 };
