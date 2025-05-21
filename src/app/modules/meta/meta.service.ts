@@ -48,6 +48,12 @@ const getMetadata = async (authUser: IUser) => {
           orderPlaced: '$createdAt',
         },
       },
+      {
+        $sort: { orderPlaced: -1 }, // Sort from latest to oldest
+      },
+      {
+        $limit: 7, // Limit to 7 latest orders
+      },
     ]);
 
     //Get Latest users.
@@ -152,6 +158,9 @@ const getMetadata = async (authUser: IUser) => {
           orderPlaced: '$createdAt',
         },
       },
+      {
+        $sort: { orderPlaced: -1 },
+      },
     ]);
 
     //User states chart data.
@@ -159,11 +168,16 @@ const getMetadata = async (authUser: IUser) => {
       Math.max(totalPayments, totalPurchasedProducts, totalPayments) || 1;
 
     const userStatesChart = [
-      { name: 'Total Payments', value: totalPayments / max || 0 },
-      { name: 'Total Orders', value: totalOrders / max || 0 },
+      {
+        name: 'Total Payments',
+        value: totalPayments / max || 0,
+        raw: totalPayments,
+      },
+      { name: 'Total Orders', value: totalOrders / max || 0, raw: totalOrders },
       {
         name: 'Total Purchased Products',
         value: totalPurchasedProducts / max || 0,
+        raw: totalPurchasedProducts,
       },
     ];
     return {
